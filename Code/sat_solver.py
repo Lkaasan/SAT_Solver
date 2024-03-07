@@ -48,5 +48,15 @@ def read_dimacs_file(filename):
 if __name__ == "__main__":
    file = sys.argv[1]
    cnf = read_dimacs_file(file)
+   literals = []
    for clause in cnf:
-       clause = []
+       c = []
+       for literal in clause:
+            negated = False
+            if literal < 0:
+                literal = abs(int(literal))
+                negated = True
+                
+            
+                
+            
