@@ -22,11 +22,42 @@ class DPLL:
         print(self.literals)
         
     def dpll(self):
-        assignment = self.assignment
-        if assignment is not None:
-            l = self.choose_literal()
+        if self.check_satisfiability():
+            print(self.assignment)
+            return True
         else:
-            
+            # print(self.assignment)
+            # Find pure literal
+            l = self.find_pure_literal()
+            if l is not False:
+                # print(l)
+                if l < 0:
+                    self.assignment[abs(l)] = False
+                else: 
+                    self.assignment[1] = True
+                self.dpll()
+
+            # If there's no pure literal, choose a literal to branch on
+            literal = self.choose_literal()
+            if literal is None:
+                return False
+
+            # Try assigning true
+            self.assignment[abs(literal)] = True
+            if self.dpll():
+                return True
+            else:
+                # Backtrack
+                del self.assignment[abs(literal)]
+
+            # Try assigning false
+            self.assignment[abs(literal)] = False
+            if self.dpll():
+                return True
+            else:
+                # Backtrack
+                del self.assignment[abs(literal)]
+        return False
 
     def choose_literal(self):
         # Choose a literal with the minimum occurrences
@@ -36,12 +67,17 @@ class DPLL:
         else:
             return None
         
+    def find_pure_literal(self):
+        for c in self.clauses:
+            if len(c) == 1 and abs(c[0]) not in self.assignment:
+                return c[0]
+        return False
+ 
     def check_satisfiability(self):
         for clause in self.clauses:
             clause_satisfied = False
             for literal in clause:
-                if (literal > 0 and self.assignment.get(literal)) or \
-                   (literal < 0 and not self.assignment.get(abs(literal))):
+                if (literal > 0 and self.assignment.get(literal) is True) or (literal < 0 and self.assignment.get(abs(literal)) is False):
                     clause_satisfied = True
                     break
             if not clause_satisfied:
@@ -69,6 +105,8 @@ if __name__ == "__main__":
     solver = DPLL()
     for clause in cnf:
         solver.addClause(clause)
+    solver.returnLiterals()
+    solver.returnClauses()
     if solver.dpll():
         print("Satisfiable")
     else:
