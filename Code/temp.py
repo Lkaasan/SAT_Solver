@@ -26,11 +26,8 @@ class DPLL:
             print(self.assignment)
             return True
         else:
-            # print(self.assignment)
-            # Find pure literal
             l = self.find_pure_literal()
             if l is not False:
-                # print(l)
                 if l < 0:
                     self.assignment[abs(l)] = False
                 else: 
