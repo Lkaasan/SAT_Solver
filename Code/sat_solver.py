@@ -1,37 +1,97 @@
 import sys
+import time
 
-class Literal:
-    def __init__(self, name, negated):
-        self.name = name
-        self.negated = negated
-
-    def get_name(self):
-        return self.name
-
-    def is_negated(self):
-        return self.negated
-
-
-class Clause:
-    def __init__(self, literals):
-        self.literals = literals
-        self.status = "Unresolved"
-
-    def get_literals(self):
-        return self.literals
-
-    def get_status(self):
-        return self.status
-
-    def set_status(self, s):
-        self.status = s
-
-
-class Solver:
+class DPLL:
     
     def __init__(self):
-        self.temp = 0
+        self.literals = {}
+        self.clauses = []
+        self.clause_status = []
+        self.assignment = {}
 
+    def addClause(self, clause):
+        self.clauses.append(clause)
+        self.clause_status.append("Unresolved")
+        for literal in clause:
+            if abs(literal) in self.literals.keys():
+                self.literals[abs(literal)] += 1
+            else:
+                self.literals[abs(literal)] = 1
+
+    def returnClauses(self):
+        print(self.clauses)
+        
+    def returnLiterals(self):
+        print(self.literals)
+        
+    def returnAssignment(self):
+        print(self.assignment)
+        
+    def returnClauseStatus(self):
+        print(self.clause_status)
+        
+    def dpll(self):
+        if self.check_satisfiability():
+            return True
+        else:
+            l = self.find_pure_literal()
+            if l is not False:
+                if l < 0:
+                    self.assignment[abs(l)] = False
+                else:
+                    self.assignment[l] = True
+                if self.dpll():
+                    return True
+                else:
+                    del self.assignment[abs(l)]
+
+            literal = self.choose_literal()
+            if literal is None:
+                return False
+
+            self.assignment[abs(literal)] = True
+            if self.dpll():
+                return True
+            else:
+                del self.assignment[abs(literal)]
+
+            self.assignment[abs(literal)] = False
+            if self.dpll():
+                return True
+            else:
+                del self.assignment[abs(literal)]
+        return False
+    
+    def choose_literal(self):
+        unassigned_literals = [l for l in self.literals if l not in self.assignment]
+        if unassigned_literals:
+            return max(unassigned_literals, key=self.literals.get)
+        else:
+            return None
+        
+    def find_pure_literal(self):
+        for c in self.clauses:
+            if len(c) == 1 and abs(c[0]) not in self.assignment:
+                return c[0]
+        return False
+ 
+    def check_satisfiability(self):
+        r = True
+        for index, clause in enumerate(self.clauses):
+            clause_satisfied = False
+            for literal in clause:
+                if (literal > 0 and self.assignment.get(abs(literal)) is True) or (literal < 0 and self.assignment.get(abs(literal)) is False):
+                    clause_satisfied = True
+                    self.clause_status[index] = "Resolved"
+                    break
+            if not clause_satisfied:
+                r = False
+                self.clause_status[index] = "Unresolved"
+        if r:
+            return True
+        else: 
+            return False
+            
 
 def read_dimacs_file(filename):
     cnf_formula = []
@@ -44,24 +104,21 @@ def read_dimacs_file(filename):
                 cnf_formula.append(clause)
     return cnf_formula
 
-
 if __name__ == "__main__":
-    if (len(sys.argv) != 2):
-        print("Please input 1 filename")
-    file = sys.argv[1]
-    cnf = read_dimacs_file(file)
-    print(cnf)
-    literals = []
+    start_time = time.time()
+    if len(sys.argv) != 2:
+        print("Usage: py temp.py <filename>")
+        sys.exit(1)
+    
+    filename = sys.argv[1]
+    cnf = read_dimacs_file(filename)
+    solver = DPLL()
     for clause in cnf:
-        c = []
-        for literal in clause:
-            negated = False
-            if literal < 0:
-                literal = abs(int(literal))
-                negated = True
-                for l in literals:
-                    if l.getName() == literal
-                    
-                
-                
-            
+        solver.addClause(clause)
+    if solver.dpll():
+        print("Satisfiable")
+    else:
+        print("Unsatisfiable")
+    end_time = time.time()
+    print("Time taken to solve: ", end_time - start_time, "seconds")
+    solver.returnAssignment()
