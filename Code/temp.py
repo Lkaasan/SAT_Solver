@@ -6,6 +6,7 @@ class DPLL:
         self.literals = {}
         self.clauses = []
         self.assignment = {}
+        self.count = 0
 
     def addClause(self, clause):
         self.clauses.append(clause)
@@ -21,20 +22,24 @@ class DPLL:
     def returnLiterals(self):
         print(self.literals)
         
+    def returnAssignment(self):
+        print(self.assignment)
+        
     def dpll(self):
         if self.check_satisfiability():
-            print(self.assignment)
             return True
         else:
             l = self.find_pure_literal()
             if l is not False:
                 if l < 0:
                     self.assignment[abs(l)] = False
-                else: 
-                    self.assignment[1] = True
-                self.dpll()
+                else:
+                    self.assignment[l] = True
+                if self.dpll():
+                    return True
+                else:
+                    del self.assignment[abs(l)]
 
-            # If there's no pure literal, choose a literal to branch on
             literal = self.choose_literal()
             if literal is None:
                 return False
@@ -44,7 +49,6 @@ class DPLL:
             if self.dpll():
                 return True
             else:
-                # Backtrack
                 del self.assignment[abs(literal)]
 
             # Try assigning false
@@ -52,10 +56,9 @@ class DPLL:
             if self.dpll():
                 return True
             else:
-                # Backtrack
                 del self.assignment[abs(literal)]
         return False
-
+    
     def choose_literal(self):
         # Choose a literal with the minimum occurrences
         unassigned_literals = [l for l in self.literals if l not in self.assignment]
@@ -108,3 +111,4 @@ if __name__ == "__main__":
         print("Satisfiable")
     else:
         print("Unsatisfiable")
+    solver.returnAssignment()
