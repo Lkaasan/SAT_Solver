@@ -5,11 +5,12 @@ class DPLL:
     def __init__(self):
         self.literals = {}
         self.clauses = []
+        self.clause_status = []
         self.assignment = {}
-        self.count = 0
 
     def addClause(self, clause):
         self.clauses.append(clause)
+        self.clause_status.append("Unresolved")
         for literal in clause:
             if abs(literal) in self.literals.keys():
                 self.literals[abs(literal)] += 1
@@ -26,6 +27,9 @@ class DPLL:
         print(self.assignment)
         
     def dpll(self):
+        print(self.clauses)
+        print(self.clause_status)
+        print(self.assignment)
         if self.check_satisfiability():
             return True
         else:
@@ -74,15 +78,22 @@ class DPLL:
         return False
  
     def check_satisfiability(self):
-        for clause in self.clauses:
+        r = True
+        for index, clause in enumerate(self.clauses):
             clause_satisfied = False
             for literal in clause:
-                if (literal > 0 and self.assignment.get(literal) is True) or (literal < 0 and self.assignment.get(abs(literal)) is False):
+                if (literal > 0 and self.assignment.get(abs(literal)) is True) or (literal < 0 and self.assignment.get(abs(literal)) is False):
                     clause_satisfied = True
+                    self.clause_status[index] = "Resolved"
                     break
             if not clause_satisfied:
-                return False
-        return True
+                r = False
+                self.clause_status[index] = "Unresolved"
+        if r:
+            return True
+        else: 
+            return False
+            
 
 def read_dimacs_file(filename):
     cnf_formula = []
