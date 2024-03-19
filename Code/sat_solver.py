@@ -27,7 +27,7 @@ class DPLL:
         print(self.literals)
         
     def returnAssignment(self):
-        print(self.assignment)
+        print("Assignment: " , self.assignment)
         
     def returnClauseStatus(self):
         print(self.clause_status)
