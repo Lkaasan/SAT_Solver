@@ -1,3 +1,5 @@
+# SAT Solver for imbalanced instances - Lukas Kaas Andersen
+
 import sys
 import time
 

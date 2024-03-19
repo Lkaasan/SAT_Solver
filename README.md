@@ -1,4 +1,4 @@
-Building a SAT Solver for imbalanced variables.
+Building a SAT Solver for imbalanced instances.
 
 For use, enter your CNF formula in a DIMACS format into 'cnf.txt' and run command:
 
