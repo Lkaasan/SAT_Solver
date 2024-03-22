@@ -141,3 +141,4 @@ if __name__ == "__main__":
     end_time = time.time()
     print("Time taken to solve: ", end_time - start_time, "seconds")
     solver.returnAssignment()
+    solver.returnClauseStatus()
