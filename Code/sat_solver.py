@@ -33,6 +33,11 @@ class DPLL:
         print(self.clause_status)
         
     def dpll(self):
+        for index, i in enumerate(self.clause_status):
+            if i is "Unit":
+                print(i)
+                print(self.assignment)
+                print(self.clauses[index])
         if self.check_satisfiability():
             return True
         else:
@@ -87,13 +92,25 @@ class DPLL:
                     self.clause_status[index] = "Resolved"
                     break
             if not clause_satisfied:
+                if self.check_unit_clause(clause):
+                    self.clause_status[index] = "Unit"
+                else:
+                    self.clause_status[index] = "Unresolved"
                 r = False
-                self.clause_status[index] = "Unresolved"
         if r:
             return True
         else: 
             return False
-            
+        
+    def check_unit_clause(self, clause):
+        assigned_variables = 0
+        for literal in clause:
+            if abs(literal) in self.assignment:
+                assigned_variables += 1
+        if assigned_variables == 1:
+            return True
+        else:
+            return False
 
 def read_dimacs_file(filename):
     cnf_formula = []
