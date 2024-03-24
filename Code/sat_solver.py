@@ -33,24 +33,29 @@ class DPLL:
         print(self.clause_status)
         
     def dpll(self):
-        for index, i in enumerate(self.clause_status):
-            if i is "Unit":
-                print(i)
-                print(self.assignment)
-                print(self.clauses[index])
         if self.check_satisfiability():
             return True
         else:
-            l = self.find_pure_literal()
-            if l is not False:
-                if l < 0:
-                    self.assignment[abs(l)] = False
+            pure_literal = self.find_pure_literal()
+            unit_clause_literal = self.find_unit_clause_literal()
+            if pure_literal is not False:
+                if pure_literal < 0:
+                    self.assignment[abs(pure_literal)] = False
                 else:
-                    self.assignment[l] = True
+                    self.assignment[pure_literal] = True
                 if self.dpll():
                     return True
                 else:
-                    del self.assignment[abs(l)]
+                    del self.assignment[abs(pure_literal)]       
+            # elif unit_clause_literal is not False:
+            #     if unit_clause_literal < 0:
+            #         self.assignment[abs(unit_clause_literal)] = False
+            #     else:
+            #         self.assignment[unit_clause_literal] = True
+            #     if self.dpll():
+            #         return True
+            #     else:
+            #         del self.assignment[abs(unit_clause_literal)]
 
             literal = self.choose_literal()
             if literal is None:
@@ -75,6 +80,15 @@ class DPLL:
             return max(unassigned_literals, key=self.literals.get)
         else:
             return None
+        
+    def find_unit_clause_literal(self):
+        for index, c in enumerate(self.clauses):
+            if self.clause_status[index] == "Unit":
+                for literal in c:
+                    if abs(literal) not in self.assignment:
+                        return literal
+        return False
+                
         
     def find_pure_literal(self):
         for c in self.clauses:
