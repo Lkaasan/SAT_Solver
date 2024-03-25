@@ -41,26 +41,26 @@ class DPLL:
         if self.check_satisfiability():
             return True
         else:
-            pure_literal = self.find_pure_literal()
+            # pure_literal = self.find_pure_literal()
             unit_clause_literal = self.find_unit_clause_literal()
-            if pure_literal is not False:
-                if pure_literal < 0:
-                    self.assignment[abs(pure_literal)] = False
-                else:
-                    self.assignment[pure_literal] = True
-                if self.dpll():
-                    return True
-                else:
-                    del self.assignment[abs(pure_literal)]       
-            # elif unit_clause_literal is not False:
-            #     if unit_clause_literal < 0:
-            #         self.assignment[abs(unit_clause_literal)] = False
+            # if pure_literal is not False:
+            #     if pure_literal < 0:
+            #         self.assignment[abs(pure_literal)] = False
             #     else:
-            #         self.assignment[unit_clause_literal] = True
+            #         self.assignment[pure_literal] = True
             #     if self.dpll():
             #         return True
             #     else:
-            #         del self.assignment[abs(unit_clause_literal)]
+            #         del self.assignment[abs(pure_literal)]       
+            if unit_clause_literal is not False:
+                if unit_clause_literal < 0:
+                    self.assignment[abs(unit_clause_literal)] = False
+                else:
+                    self.assignment[unit_clause_literal] = True
+                if self.dpll():
+                    return True
+                else:
+                    del self.assignment[abs(unit_clause_literal)]
 
             literal = self.choose_literal()
             if literal is None:
@@ -89,6 +89,9 @@ class DPLL:
     def find_unit_clause_literal(self):
         for index, c in enumerate(self.clauses):
             if self.clause_status[index] == "Unit":
+                # print(self.assignment)
+                # print(c)
+                # time.sleep(5)
                 for literal in c:
                     if abs(literal) not in self.assignment:
                         return literal
@@ -126,7 +129,10 @@ class DPLL:
         for literal in clause:
             if abs(literal) in self.assignment:
                 assigned_variables += 1
-        if assigned_variables == 1:
+        if assigned_variables == len(clause) - 1:
+            # print(clause)
+            # print(self.assignment)
+            # time.sleep(5)
             return True
         else:
             return False
@@ -153,6 +159,7 @@ if __name__ == "__main__":
     solver = DPLL()
     for clause in cnf:
         solver.addClause(clause)
+    print(solver.returnLiterals())
     if solver.dpll():
         print("Satisfiable")
     else:
