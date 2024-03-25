@@ -11,7 +11,7 @@ class DPLL:
         self.clause_status = []
         self.assignment = {}
 
-    def addClause(self, clause):
+    def add_clause(self, clause):
         self.clauses.append(clause)
         self.clause_status.append("Unresolved")
         for literal in clause:
@@ -20,17 +20,17 @@ class DPLL:
             else:
                 self.literals[abs(literal)] = 1
 
-    def returnClauses(self):
-        print(self.clauses)
+    def get_clauses(self):
+        return self.clauses
         
-    def returnLiterals(self):
-        print(self.literals)
+    def get_literals(self):
+        return self.literals
         
-    def returnAssignment(self):
-        print("Assignment: " , self.assignment)
+    def get_assignment(self):
+        return self.assignment
         
-    def returnClauseStatus(self):
-        print(self.clause_status)
+    def get_clause_status(self):
+        return self.clause_status
         
     def dpll(self):
         # for index, i in enumerate(self.clause_status):
@@ -130,9 +130,6 @@ class DPLL:
             if abs(literal) in self.assignment:
                 assigned_variables += 1
         if assigned_variables == len(clause) - 1:
-            # print(clause)
-            # print(self.assignment)
-            # time.sleep(5)
             return True
         else:
             return False
@@ -158,13 +155,11 @@ if __name__ == "__main__":
     cnf = read_dimacs_file(filename)
     solver = DPLL()
     for clause in cnf:
-        solver.addClause(clause)
-    print(solver.returnLiterals())
+        solver.add_clause(clause)
     if solver.dpll():
         print("Satisfiable")
     else:
         print("Unsatisfiable")
     end_time = time.time()
     print("Time taken to solve: ", end_time - start_time, "seconds")
-    solver.returnAssignment()
-    solver.returnClauseStatus()
+    print("Assignment: ", solver.get_assignment())
