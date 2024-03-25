@@ -33,25 +33,10 @@ class DPLL:
         return self.clause_status
         
     def dpll(self):
-        # for index, i in enumerate(self.clause_status):
-        #     if i is "Unit":
-        #         # print(i)
-        #         # print(self.assignment)
-        #         # print(self.clauses[index])
         if self.check_satisfiability():
             return True
         else:
-            # pure_literal = self.find_pure_literal()
             unit_clause_literal = self.find_unit_clause_literal()
-            # if pure_literal is not False:
-            #     if pure_literal < 0:
-            #         self.assignment[abs(pure_literal)] = False
-            #     else:
-            #         self.assignment[pure_literal] = True
-            #     if self.dpll():
-            #         return True
-            #     else:
-            #         del self.assignment[abs(pure_literal)]       
             if unit_clause_literal is not False:
                 if unit_clause_literal < 0:
                     self.assignment[abs(unit_clause_literal)] = False
@@ -61,11 +46,11 @@ class DPLL:
                     return True
                 else:
                     del self.assignment[abs(unit_clause_literal)]
-
+            
             literal = self.choose_literal()
             if literal is None:
                 return False
-
+            
             self.assignment[abs(literal)] = True
             if self.dpll():
                 return True
@@ -89,9 +74,6 @@ class DPLL:
     def find_unit_clause_literal(self):
         for index, c in enumerate(self.clauses):
             if self.clause_status[index] == "Unit":
-                # print(self.assignment)
-                # print(c)
-                # time.sleep(5)
                 for literal in c:
                     if abs(literal) not in self.assignment:
                         return literal
@@ -138,8 +120,8 @@ def read_dimacs_file(filename):
     cnf_formula = []
     with open(filename, 'r') as file:
         for line in file:
-            if line.startswith('c') or line.startswith('p'):
-                continue  # Skip comment lines and problem description lines
+            if line.startswith('c') or line.startswith('p') or line.startswith('%') or line.startswith('0'):
+                continue 
             clause = [int(x) for x in line.strip().split() if x != '0']
             if clause:
                 cnf_formula.append(clause)
