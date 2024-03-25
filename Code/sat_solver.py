@@ -33,11 +33,11 @@ class DPLL:
         print(self.clause_status)
         
     def dpll(self):
-        for index, i in enumerate(self.clause_status):
-            if i is "Unit":
-                print(i)
-                print(self.assignment)
-                print(self.clauses[index])
+        # for index, i in enumerate(self.clause_status):
+        #     if i is "Unit":
+        #         # print(i)
+        #         # print(self.assignment)
+        #         # print(self.clauses[index])
         if self.check_satisfiability():
             return True
         else:
