@@ -33,25 +33,24 @@ class DPLL:
         return self.clause_status
         
     def dpll(self):
-        # for index, i in enumerate(self.clause_status):
-        #     if i is "Unit":
-        #         # print(i)
-        #         # print(self.assignment)
-        #         # print(self.clauses[index])
+        # print(self.assignment)
         if self.check_satisfiability():
             return True
+        elif self.check_conflict():
+            print("conflict")
+            return False
         else:
-            # pure_literal = self.find_pure_literal()
+            pure_literal = self.find_pure_literal()
             unit_clause_literal = self.find_unit_clause_literal()
-            # if pure_literal is not False:
-            #     if pure_literal < 0:
-            #         self.assignment[abs(pure_literal)] = False
-            #     else:
-            #         self.assignment[pure_literal] = True
-            #     if self.dpll():
-            #         return True
-            #     else:
-            #         del self.assignment[abs(pure_literal)]       
+            if pure_literal is not False:
+                if pure_literal < 0:
+                    self.assignment[abs(pure_literal)] = False
+                else:
+                    self.assignment[pure_literal] = True
+                if self.dpll():
+                    return True
+                else:
+                    del self.assignment[abs(pure_literal)]       
             if unit_clause_literal is not False:
                 if unit_clause_literal < 0:
                     self.assignment[abs(unit_clause_literal)] = False
@@ -63,9 +62,10 @@ class DPLL:
                     del self.assignment[abs(unit_clause_literal)]
 
             literal = self.choose_literal()
+
             if literal is None:
                 return False
-
+            
             self.assignment[abs(literal)] = True
             if self.dpll():
                 return True
@@ -79,6 +79,20 @@ class DPLL:
                 del self.assignment[abs(literal)]
         return False
     
+    def check_conflict(self):
+        for clause in self.clauses:
+            assigned_literal = 0 
+            all_false_checker = True
+            for index, literal in enumerate(clause):
+                if abs(literal) in self.assignment:
+                    assigned_literal += 1
+                    if (literal > 0 and self.assignment.get(abs(literal)) is True) or (literal < 0 and self.assignment.get(abs(literal)) is False):
+                        all_false_checker = False
+            if assigned_literal == len(clause) and all_false_checker == True:
+                return True
+        return False
+            
+
     def choose_literal(self):
         unassigned_literals = [l for l in self.literals if l not in self.assignment]
         if unassigned_literals:
@@ -89,9 +103,6 @@ class DPLL:
     def find_unit_clause_literal(self):
         for index, c in enumerate(self.clauses):
             if self.clause_status[index] == "Unit":
-                # print(self.assignment)
-                # print(c)
-                # time.sleep(5)
                 for literal in c:
                     if abs(literal) not in self.assignment:
                         return literal
@@ -138,7 +149,7 @@ def read_dimacs_file(filename):
     cnf_formula = []
     with open(filename, 'r') as file:
         for line in file:
-            if line.startswith('c') or line.startswith('p'):
+            if line.startswith('c') or line.startswith('p') or line.startswith('%') or line.startswith('0'):
                 continue  # Skip comment lines and problem description lines
             clause = [int(x) for x in line.strip().split() if x != '0']
             if clause:
