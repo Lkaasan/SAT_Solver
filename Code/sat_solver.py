@@ -41,7 +41,6 @@ class DPLL:
         if self.check_satisfiability():
             return True
         elif self.check_conflict():
-            print("conflict")
             return False
         else:
             pure_literal = self.find_pure_literal()
@@ -172,6 +171,7 @@ if __name__ == "__main__":
     solver = DPLL()
     for clause in cnf:
         solver.add_clause(clause)
+    print(solver.get_literals())
     if solver.dpll():
         print("Satisfiable")
     else:
