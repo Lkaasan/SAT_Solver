@@ -33,7 +33,11 @@ class DPLL:
         return self.clause_status
         
     def dpll(self):
-        # print(self.assignment)
+        # for index, i in enumerate(self.clause_status):
+        #     if i is "Unit":
+        #         # print(i)
+        #         # print(self.assignment)
+        #         # print(self.clauses[index])
         if self.check_satisfiability():
             return True
         elif self.check_conflict():
@@ -60,11 +64,12 @@ class DPLL:
                     return True
                 else:
                     del self.assignment[abs(unit_clause_literal)]
-
+            
             literal = self.choose_literal()
 
             if literal is None:
                 return False
+            
             
             self.assignment[abs(literal)] = True
             if self.dpll():
