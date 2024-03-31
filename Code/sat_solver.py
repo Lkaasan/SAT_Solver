@@ -88,10 +88,6 @@ class DPLL:
                     if (literal > 0 and self.assignment.get(abs(literal)) is True) or (literal < 0 and self.assignment.get(abs(literal)) is False):
                         all_false_checker = False
             if assigned_literal == len(clause) and all_false_checker == True:
-                print(self.assignment)
-                print(clause)
-                print("conflcit")
-                time.sleep(1)
                 return True
         return False
             
