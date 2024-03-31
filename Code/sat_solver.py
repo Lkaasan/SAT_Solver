@@ -2,6 +2,7 @@
 
 import sys
 import time
+import random
 
 class DPLL:
     
@@ -64,7 +65,6 @@ class DPLL:
             if literal is None:
                 return False
             
-            
             self.assignment[abs(literal)] = True
             if self.dpll():
                 return True
@@ -88,6 +88,10 @@ class DPLL:
                     if (literal > 0 and self.assignment.get(abs(literal)) is True) or (literal < 0 and self.assignment.get(abs(literal)) is False):
                         all_false_checker = False
             if assigned_literal == len(clause) and all_false_checker == True:
+                print(self.assignment)
+                print(clause)
+                print("conflcit")
+                time.sleep(1)
                 return True
         return False
             
@@ -95,7 +99,10 @@ class DPLL:
     def choose_literal(self):
         unassigned_literals = [l for l in self.literals if l not in self.assignment]
         if unassigned_literals:
-            return max(unassigned_literals, key=self.literals.get)
+            max_literal = max(unassigned_literals, key=self.literals.get)
+            max_value = self.literals.get(max_literal)
+            max_variables = [l for l in unassigned_literals if self.literals.get(l) == max_value]
+            return random.choice(max_variables)
         else:
             return None
         
@@ -121,13 +128,22 @@ class DPLL:
             for literal in clause:
                 if (literal > 0 and self.assignment.get(abs(literal)) is True) or (literal < 0 and self.assignment.get(abs(literal)) is False):
                     clause_satisfied = True
-                    self.clause_status[index] = "Resolved"
+                    if self.clause_status[index] != "Resolved":
+                        for l in clause:
+                            self.literals[abs(l)] -= 1
+                        self.clause_status[index] = "Resolved"
                     break
             if not clause_satisfied:
                 if self.check_unit_clause(clause):
-                    self.clause_status[index] = "Unit"
+                    if self.clause_status[index] == "Resolved":
+                        for l in clause:
+                            self.literals[abs(l)] += 1
+                        self.clause_status[index] = "Unit"
                 else:
-                    self.clause_status[index] = "Unresolved"
+                    if self.clause_status[index] == "Resolved":
+                        for l in clause:
+                            self.literals[abs(l)] += 1
+                        self.clause_status[index] = "Unresolved"
                 r = False
         if r:
             return True
