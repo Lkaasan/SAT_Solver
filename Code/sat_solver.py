@@ -11,8 +11,12 @@ class DPLL:
         self.clauses = []
         self.clause_status = []
         self.assignment = {}
+        self.initial_pure_literal_count = 0
+        self.pure_literal_tracker = 0
 
     def add_clause(self, clause):
+        if len(clause) == 1:
+            self.initial_pure_literal_count += 1
         self.clauses.append(clause)
         self.clause_status.append("Unresolved")
         for literal in clause:
@@ -34,22 +38,25 @@ class DPLL:
         return self.clause_status
         
     def dpll(self):
+        print(self.assignment)
         if self.check_satisfiability():
             return True
         elif self.check_conflict():
             return False
         else:
-            pure_literal = self.find_pure_literal()
-            unit_clause_literal = self.find_unit_clause_literal()
-            if pure_literal is not False:
-                if pure_literal < 0:
-                    self.assignment[abs(pure_literal)] = False
-                else:
-                    self.assignment[pure_literal] = True
-                if self.dpll():
-                    return True
-                else:
-                    del self.assignment[abs(pure_literal)]       
+            if self.pure_literal_tracker != self.initial_pure_literal_count:
+                pure_literal = self.find_pure_literal()
+                if pure_literal is not False:
+                    self.pure_literal_tracker += 1
+                    if pure_literal < 0:
+                        self.assignment[abs(pure_literal)] = False
+                    else:
+                        self.assignment[pure_literal] = True
+                    if self.dpll():
+                        return True
+                    else:
+                        del self.assignment[abs(pure_literal)]     
+            unit_clause_literal = self.find_unit_clause_literal()  
             if unit_clause_literal is not False:
                 if unit_clause_literal < 0:
                     self.assignment[abs(unit_clause_literal)] = False
@@ -110,7 +117,6 @@ class DPLL:
                         return literal
         return False
                 
-        
     def find_pure_literal(self):
         for c in self.clauses:
             if len(c) == 1 and abs(c[0]) not in self.assignment:
@@ -161,7 +167,7 @@ def read_dimacs_file(filename):
     with open(filename, 'r') as file:
         for line in file:
             if line.startswith('c') or line.startswith('p') or line.startswith('%') or line.startswith('0'):
-                continue  # Skip comment lines and problem description lines
+                continue  
             clause = [int(x) for x in line.strip().split() if x != '0']
             if clause:
                 cnf_formula.append(clause)
@@ -170,7 +176,7 @@ def read_dimacs_file(filename):
 if __name__ == "__main__":
     start_time = time.time()
     if len(sys.argv) != 2:
-        print("Usage: py temp.py <filename>")
+        print("Usage: py sat_solver.py <filename>")
         sys.exit(1)
     
     filename = sys.argv[1]
