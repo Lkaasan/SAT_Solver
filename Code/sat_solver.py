@@ -8,21 +8,27 @@ class DPLL:
     
     def __init__(self):
         self.literals = {}
-        self.clauses = []
-        self.clause_status = []
+        self.clauses = {}
         self.assignment = {}
+        self.literals_polarities = {}
         self.initial_pure_literal_count = 0
         self.pure_literal_tracker = 0
 
     def add_clause(self, clause):
         if len(clause) == 1:
+            print("hello")
             self.initial_pure_literal_count += 1
-        self.clauses.append(clause)
-        self.clause_status.append("Unresolved")
+        self.clauses[tuple(clause)] = "Unresolved"
         for literal in clause:
             if abs(literal) in self.literals.keys():
                 self.literals[abs(literal)] += 1
+                self.literals_polarities[literal] += 1
             else:
+                self.literals_polarities[literal] = 1
+                if literal < 0:
+                    self.literals_polarities[abs(literal)] = 0
+                else:
+                    self.literals_polarities[0 - literal] = 0
                 self.literals[abs(literal)] = 1
 
     def get_clauses(self):
@@ -33,17 +39,17 @@ class DPLL:
         
     def get_assignment(self):
         return self.assignment
-        
-    def get_clause_status(self):
-        return self.clause_status
+    
+    def get_literals_polarities(self):
+        return self.literals_polarities
         
     def dpll(self):
-        time.sleep(0.25)
-        print(self.assignment)
+        # time.sleep(1)
+        # print(self.assignment)
         if self.check_satisfiability():
             return True
         elif self.check_conflict():
-            print("conflict!")
+            # print("conflict!")
             return False
         else:
             if self.pure_literal_tracker != self.initial_pure_literal_count:
@@ -70,17 +76,21 @@ class DPLL:
                     del self.assignment[abs(unit_clause_literal)]
             
             literal = self.choose_literal()
-
+            
             if literal is None:
                 return False
+            if self.literals_polarities.get(literal) > self.literals_polarities.get(0 - int(literal)):
+                assignment = True
+            else:
+                assignment  = False
+            self.assignment[literal] = assignment
             
-            self.assignment[abs(literal)] = True
             if self.dpll():
                 return True
             else:
                 del self.assignment[abs(literal)]
 
-            self.assignment[abs(literal)] = False
+            self.assignment[abs(literal)] = not assignment
             if self.dpll():
                 return True
             else:
@@ -97,7 +107,7 @@ class DPLL:
                     if (literal > 0 and self.assignment.get(abs(literal)) is True) or (literal < 0 and self.assignment.get(abs(literal)) is False):
                         all_false_checker = False
             if assigned_literal == len(clause) and all_false_checker == True:
-                print(clause)
+                # print(clause)
                 return True
         return False
             
@@ -113,12 +123,17 @@ class DPLL:
             return None
         
     def find_unit_clause_literal(self):
-        for index, c in enumerate(self.clauses):
-            if self.clause_status[index] == "Unit":
+        literals = []
+        for c in self.clauses:
+            if self.clauses[c] == "Unit":
                 for literal in c:
                     if abs(literal) not in self.assignment:
-                        return literal
-        return False
+                        if abs(literal) not in literals:
+                            literals.append(abs(literal))
+        if literals != []:
+            return random.choice(literals)
+        else:
+            return False
                 
     def find_pure_literal(self):
         for c in self.clauses:
@@ -128,27 +143,27 @@ class DPLL:
  
     def check_satisfiability(self):
         r = True
-        for index, clause in enumerate(self.clauses):
+        for clause in self.clauses:
             clause_satisfied = False
             for literal in clause:
                 if (literal > 0 and self.assignment.get(abs(literal)) is True) or (literal < 0 and self.assignment.get(abs(literal)) is False):
                     clause_satisfied = True
-                    if self.clause_status[index] != "Resolved":
+                    if self.clauses[clause] != "Resolved":
                         for l in clause:
                             self.literals[abs(l)] -= 1
-                        self.clause_status[index] = "Resolved"
+                        self.clauses[clause] = "Resolved"
                     break
             if not clause_satisfied:
                 if self.check_unit_clause(clause):
-                    if self.clause_status[index] == "Resolved":
+                    if self.clauses[clause] == "Resolved":
                         for l in clause:
                             self.literals[abs(l)] += 1
-                        self.clause_status[index] = "Unit"
+                        self.clauses[clause] = "Unit"
                 else:
-                    if self.clause_status[index] == "Resolved":
+                    if self.clauses[clause] == "Resolved":
                         for l in clause:
                             self.literals[abs(l)] += 1
-                        self.clause_status[index] = "Unresolved"
+                        self.clauses[clause] = "Unresolved"
                 r = False
         if r:
             return True
@@ -188,6 +203,7 @@ if __name__ == "__main__":
     for clause in cnf:
         solver.add_clause(clause)
     print(solver.get_literals())
+    print(solver.get_literals_polarities())
     if solver.dpll():
         print("Satisfiable")
     else:
