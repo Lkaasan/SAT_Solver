@@ -38,10 +38,12 @@ class DPLL:
         return self.clause_status
         
     def dpll(self):
+        # time.sleep(0.4)
         print(self.assignment)
         if self.check_satisfiability():
             return True
         elif self.check_conflict():
+            print("conflict!")
             return False
         else:
             if self.pure_literal_tracker != self.initial_pure_literal_count:
@@ -95,6 +97,7 @@ class DPLL:
                     if (literal > 0 and self.assignment.get(abs(literal)) is True) or (literal < 0 and self.assignment.get(abs(literal)) is False):
                         all_false_checker = False
             if assigned_literal == len(clause) and all_false_checker == True:
+                print(clause)
                 return True
         return False
             
