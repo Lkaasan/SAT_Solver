@@ -38,7 +38,7 @@ class DPLL:
         return self.clause_status
         
     def dpll(self):
-        # time.sleep(0.4)
+        time.sleep(0.25)
         print(self.assignment)
         if self.check_satisfiability():
             return True
@@ -97,7 +97,7 @@ class DPLL:
                     if (literal > 0 and self.assignment.get(abs(literal)) is True) or (literal < 0 and self.assignment.get(abs(literal)) is False):
                         all_false_checker = False
             if assigned_literal == len(clause) and all_false_checker == True:
-                # print(clause)
+                print(clause)
                 return True
         return False
             
