@@ -44,7 +44,6 @@ class DPLL:
         return self.literals_polarities
         
     def dpll(self):
-        # time.sleep(1)
         # print(self.assignment)
         if self.check_satisfiability():
             return True
