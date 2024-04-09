@@ -45,12 +45,15 @@ class DPLL:
         
     def dpll(self):
         # print(self.assignment)
+        # print(self.clauses)
+        # print('---------------------------------------------------------------')
+        # time.sleep(0.5)
         if self.check_satisfiability():
             return True
         elif self.check_conflict():
             # print("conflict!")
             return False
-        else:
+        else: 
             if self.pure_literal_tracker != self.initial_pure_literal_count:
                 pure_literal = self.find_pure_literal()
                 if pure_literal is not False:
@@ -133,7 +136,7 @@ class DPLL:
             return random.choice(literals)
         else:
             return False
-                
+        
     def find_pure_literal(self):
         for c in self.clauses:
             if len(c) == 1 and abs(c[0]) not in self.assignment:
@@ -158,6 +161,11 @@ class DPLL:
                         for l in clause:
                             self.literals[abs(l)] += 1
                         self.clauses[clause] = "Unit"
+                elif self.check_close_unit_clause(clause):
+                    if self.clauses[clause] == "Resolved":
+                        for l in clause:
+                            self.literals[abs(l)] += 1
+                        self.clauses[clause] = "One Off Unit"
                 else:
                     if self.clauses[clause] == "Resolved":
                         for l in clause:
@@ -178,7 +186,17 @@ class DPLL:
             return True
         else:
             return False
-
+                
+    def check_close_unit_clause(self, clause):
+        assigned_variables = 0
+        for literal in clause:
+            if abs(literal) in self.assignment:
+                assigned_variables += 1
+        if assigned_variables == len(clause) - 2:
+            return True
+        else:
+            return False
+         
 def read_dimacs_file(filename):
     cnf_formula = []
     with open(filename, 'r') as file:
