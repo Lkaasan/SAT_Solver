@@ -133,9 +133,6 @@ class DPLL:
             return False
         
     def populate_pure_literal(self):
-        for c in self.clauses:
-            if len(c) == 1:
-                self.pure_literals.append(c[0])
         for literal in self.literals:
             positive_literal = self.literals_polarities.get(literal)
             negative_literal = self.literals_polarities.get(0 - literal)
@@ -143,6 +140,9 @@ class DPLL:
                 self.pure_literals.append(0 - literal)
             elif (positive_literal != 0 and negative_literal == 0):
                 self.pure_literals.append(literal)
+        for c in self.clauses:
+            if len(c) == 1:
+                self.pure_literals.append(c[0])
             
  
     def check_satisfiability(self):
