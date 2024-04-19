@@ -140,7 +140,7 @@ class DPLL:
             positive_literal = self.literals_polarities.get(literal)
             negative_literal = self.literals_polarities.get(0 - literal)
             if (positive_literal == 0 and negative_literal != 0):
-                self.pure_liteals.append(0 - literal)
+                self.pure_literals.append(0 - literal)
             elif (positive_literal != 0 and negative_literal == 0):
                 self.pure_literals.append(literal)
             
