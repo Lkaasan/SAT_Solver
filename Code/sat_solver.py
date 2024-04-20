@@ -3,6 +3,7 @@
 import sys
 import time
 import random
+import threading
 
 class DPLL:
     
@@ -40,16 +41,16 @@ class DPLL:
         return self.literals_polarities
         
     def dpll(self):
-        # print(self.assignment)
-        # print(self.clauses)
-        # print('---------------------------------------------------------------')
-        # time.sleep(0.5)
         if self.check_satisfiability():
             return True
         elif self.check_conflict():
             # print("conflict!")
             return False
         else: 
+            # print(self.assignment)
+            # print(self.clauses)
+            # print('---------------------------------------------------------------')
+            # time.sleep(0.1)
             if not bool(self.pure_literals) is not True:
                 print(self.pure_literals)
                 pure_literal = self.pure_literals.pop()
@@ -72,7 +73,7 @@ class DPLL:
                 else:
                     del self.assignment[abs(unit_clause_literal)]
             
-            literal = self.choose_literal()
+            literal = self.choose_literal([])
             
             if literal is None:
                 return False
@@ -104,31 +105,50 @@ class DPLL:
                     if (literal > 0 and self.assignment.get(abs(literal)) is True) or (literal < 0 and self.assignment.get(abs(literal)) is False):
                         all_false_checker = False
             if assigned_literal == len(clause) and all_false_checker == True:
-                # print(clause)
                 return True
         return False
             
 
-    def choose_literal(self):
-        unassigned_literals = [l for l in self.literals if l not in self.assignment]
-        if unassigned_literals:
+    def choose_literal(self, unassigned_literals):
+        if unassigned_literals == []:
+            unassigned_literals = [l for l in self.literals if l not in self.assignment]
             max_literal = max(unassigned_literals, key=self.literals.get)
             max_value = self.literals.get(max_literal)
             max_variables = [l for l in unassigned_literals if self.literals.get(l) == max_value]
             return random.choice(max_variables)
+        elif unassigned_literals != []:
+            max_literals = []
+            max_occurance = 0
+            for l in unassigned_literals:
+                occurance = self.literals.get(abs(l))
+                if occurance > max_occurance:
+                    max_literals = []
+                    max_literals.append(l)
+                    max_occurance = occurance
+                elif occurance == max_occurance:
+                    max_literals.append(l)
+            return random.choice(max_literals)
         else:
             return None
         
     def find_unit_clause_literal(self):
-        literals = []
+        unit_literals = []
+        one_off_unit_literals = []
         for c in self.clauses:
             if self.clauses[c] == "Unit":
                 for literal in c:
                     if abs(literal) not in self.assignment:
-                        if abs(literal) not in literals:
-                            literals.append(abs(literal))
-        if literals != []:
-            return random.choice(literals)
+                        if abs(literal) not in unit_literals:
+                            unit_literals.append(literal)
+            elif self.clauses[c] == "One Off Unit":
+                for literal in c:
+                    if abs(literal) not in self.assignment:
+                        if abs(literal) not in one_off_unit_literals:
+                            one_off_unit_literals.append(literal)
+        if unit_literals != []:
+            return random.choice(unit_literals)
+        elif one_off_unit_literals != []:
+            return self.choose_literal(one_off_unit_literals)
         else:
             return False
         
@@ -162,12 +182,12 @@ class DPLL:
                     if self.clauses[clause] == "Resolved":
                         for l in clause:
                             self.literals[abs(l)] += 1
-                        self.clauses[clause] = "Unit"
+                    self.clauses[clause] = "Unit"
                 elif self.check_close_unit_clause(clause):
                     if self.clauses[clause] == "Resolved":
                         for l in clause:
                             self.literals[abs(l)] += 1
-                        self.clauses[clause] = "One Off Unit"
+                    self.clauses[clause] = "One Off Unit"
                 else:
                     if self.clauses[clause] == "Resolved":
                         for l in clause:
@@ -210,8 +230,10 @@ def read_dimacs_file(filename):
                 cnf_formula.append(clause)
     return cnf_formula
 
+
 if __name__ == "__main__":
     start_time = time.time()
+    
     if len(sys.argv) != 2:
         print("Usage: py sat_solver.py <filename>")
         sys.exit(1)
@@ -224,6 +246,7 @@ if __name__ == "__main__":
     print(solver.get_literals())
     print(solver.get_literals_polarities())
     solver.populate_pure_literal()
+    
     if solver.dpll():
         print("Satisfiable")
     else:
