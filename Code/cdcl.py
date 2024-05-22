@@ -11,6 +11,7 @@ class CDCL:
         self.assignment = {}
         self.learned_clauses = []
         self.decision_stack = []
+        self.decision_level = 0
     
     def add_clause(self, clause):
         if len(clause) == 1:
@@ -33,13 +34,14 @@ class CDCL:
         return [literal for literal in self.literals if literal not in self.assignment]
     
     def dpll(self):
-        decision_level = 0
         while True:
             self.unit_propogation()
-            
-    #         #conflict analysis
-            
-    #         #decision
+            if (self.conflict_analysis):
+                if (decision_level == 0):
+                    return False
+                self.backtack()
+            else:
+                self.make_decision()
             
     def unit_propogation(self):
         for clause in self.clauses:
@@ -54,11 +56,14 @@ class CDCL:
                 else:
                     self.assignment[literal] == True
                             
-    # def conflict_analysis(self):
-    #     continue
+    def conflict_analysis(self):    
+        continue
     
-    # def backtack(self):
-    #     continue    
+    def make_decision(self):
+        continue
+    
+    def backtack(self):
+        continue    
           
 def read_dimacs_file(filename):
     cnf_formula = []
@@ -72,7 +77,6 @@ def read_dimacs_file(filename):
     return cnf_formula
 
 if __name__ == "__main__":
-    start_time = time.time()
     
     if len(sys.argv) != 2:
         print("Usage: py cdcl.py <filename.txt>")
@@ -81,6 +85,7 @@ if __name__ == "__main__":
     
     filename = sys.argv[1]
     cnf_formula = read_dimacs_file(filename)
+    start_time = time.time()
     solver = CDCL()
     for clause in cnf_formula:
         solver.add_clause(clause)
