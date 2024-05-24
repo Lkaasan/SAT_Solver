@@ -36,13 +36,54 @@ class CDCL:
     def dpll(self):
         while True:
             self.unit_propogation()
+            self.change_clause_states()
+            print(self.clauses)
             if (self.conflict_analysis):
-                if (decision_level == 0):
+                if (self.decision_level == 0):
                     return False
                 self.backtack()
+            elif not self.get_unassigned_literals():
+                return True
             else:
                 self.make_decision()
             
+    def change_clause_states(self):
+        for clause in self.clauses:
+            clause_satisfied = False
+            for literal in clause:
+                if (literal > 0 and self.assignment.get(abs(literal)) is True) or (literal < 0 and self.assignment.get(abs(literal)) is False):
+                    clause_satisfied = True
+                    if self.clauses[clause] != "Resolved":
+                        self.clauses[clause] = "Resolved"
+                    break
+            if not clause_satisfied:
+                if self.check_unit_clause(clause):
+                    self.clauses[clause] == "Unit"
+                elif self.check_conflict_clause(clause):
+                    self.clauses[clause] == "Conflict"
+                else:
+                    self.clauses[clause] == "Unresolved"
+                    
+    def check_conflict_clause(self, clause):
+        assigned_variables = 0
+        for l in clause:
+            if abs(l) in self.assignment:
+                assigned_variables += 1
+        if assigned_variables == len(clause):
+            return True
+        else:
+            return False
+            
+    def check_unit_clause(self, clause):
+        assigned_variables = 0
+        for literal in clause:
+            if abs(literal) in self.assignment:
+                assigned_variables += 1
+        if assigned_variables == len(clause) - 1:
+            return True
+        else:
+            return False           
+    
     def unit_propogation(self):
         for clause in self.clauses:
             if self.clauses.get(clause) == "Unit":
@@ -57,13 +98,25 @@ class CDCL:
                     self.assignment[literal] == True
                             
     def conflict_analysis(self):    
-        continue
+        conflicting_clauses = []
+        for clause in self.clauses:
+            if self.clauses.get(clause) == "Conflict":
+                conflicting_clauses.append(clause)
+        if conflicting_clauses == []:
+            return False
+        else:
+            self.learn_clause()
+            return True
+    
+    
+    def learn_clause(self, clauses):
+        return
     
     def make_decision(self):
-        continue
+        return
     
-    def backtack(self):
-        continue    
+    def backjump(self):
+        return    
           
 def read_dimacs_file(filename):
     cnf_formula = []
