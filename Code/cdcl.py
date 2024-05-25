@@ -37,8 +37,7 @@ class CDCL:
         while True:
             self.unit_propogation()
             self.change_clause_states()
-            print(self.clauses)
-            if (self.conflict_analysis):
+            if (self.conflict_analysis()):
                 if (self.decision_level == 0):
                     return False
                 self.backtack()
@@ -46,6 +45,7 @@ class CDCL:
                 return True
             else:
                 self.make_decision()
+                self.change_clause_states()
             
     def change_clause_states(self):
         for clause in self.clauses:
@@ -58,12 +58,12 @@ class CDCL:
                     break
             if not clause_satisfied:
                 if self.check_unit_clause(clause):
-                    self.clauses[clause] == "Unit"
-                elif self.check_conflict_clause(clause):
-                    self.clauses[clause] == "Conflict"
+                    self.clauses[clause] = "Unit"
+                elif self.check_conflict_clause(clause) == True:
+                    self.clauses[clause] = "Conflict"
                 else:
-                    self.clauses[clause] == "Unresolved"
-                    
+                    self.clauses[clause] = "Unresolved"
+        
     def check_conflict_clause(self, clause):
         assigned_variables = 0
         for l in clause:
@@ -92,10 +92,9 @@ class CDCL:
     def assign_unit_clause(self, clause):
         for literal in clause:
             if literal not in self.assignment:
-                if literal < 0:
-                    self.assignment[literal] == False
-                else:
-                    self.assignment[literal] == True
+                assignment = literal > 0
+                self.assignment[abs(literal)] = assignment
+                self.decision_stack.append((abs(literal), assignment, self.decision_level))
                             
     def conflict_analysis(self):    
         conflicting_clauses = []
@@ -105,18 +104,24 @@ class CDCL:
         if conflicting_clauses == []:
             return False
         else:
-            self.learn_clause()
             return True
     
     
     def learn_clause(self, clauses):
-        return
+        pass
     
     def make_decision(self):
-        return
+        unassigned_literals = self.get_unassigned_literals()
+        if unassigned_literals:
+            chosen_literal = random.choice(unassigned_literals)
+            self.decision_level += 1
+            assignment = random.choice([True, False])
+            self.assignment[chosen_literal] = assignment
+            self.decision_stack.append((chosen_literal, assignment, self.decision_level))
+            print(f"Decision made: {chosen_literal} = {assignment} at level {self.decision_level}")
     
     def backjump(self):
-        return    
+        pass    
           
 def read_dimacs_file(filename):
     cnf_formula = []
