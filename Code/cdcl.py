@@ -3,6 +3,15 @@ import time
 import random
 
 
+class Node:
+    
+    def __init__(self, literal, type, level):
+        self.literal = literal
+        self.type = type
+        self.pointed_at = []
+        self.pointing_to = []
+        self.level = level
+        
 class CDCL:
     
     def __init__(self):
@@ -35,8 +44,9 @@ class CDCL:
     
     def dpll(self):
         while True:
+            time.sleep(1)
+            print(self.decision_stack)
             self.unit_propogation()
-            self.change_clause_states()
             if (self.conflict_analysis()):
                 if (self.decision_level == 0):
                     return False
@@ -48,6 +58,7 @@ class CDCL:
                 self.change_clause_states()
             
     def change_clause_states(self):
+        unit_change = False
         for clause in self.clauses:
             clause_satisfied = False
             for literal in clause:
@@ -59,10 +70,12 @@ class CDCL:
             if not clause_satisfied:
                 if self.check_unit_clause(clause):
                     self.clauses[clause] = "Unit"
+                    unit_change = True
                 elif self.check_conflict_clause(clause) == True:
                     self.clauses[clause] = "Conflict"
                 else:
                     self.clauses[clause] = "Unresolved"
+        return unit_change
         
     def check_conflict_clause(self, clause):
         assigned_variables = 0
@@ -85,13 +98,17 @@ class CDCL:
             return False           
     
     def unit_propogation(self):
-        for clause in self.clauses:
-            if self.clauses.get(clause) == "Unit":
-                self.assign_unit_clause(clause)
+        while True:
+            for clause in self.clauses:
+                if self.clauses.get(clause) == "Unit":
+                    self.assign_unit_clause(clause)
+            if self.change_clause_states() == False:
+                break
+                
     
     def assign_unit_clause(self, clause):
         for literal in clause:
-            if literal not in self.assignment:
+            if abs(literal) not in self.assignment:
                 assignment = literal > 0
                 self.assignment[abs(literal)] = assignment
                 self.decision_stack.append((abs(literal), assignment, self.decision_level))
@@ -114,11 +131,11 @@ class CDCL:
         unassigned_literals = self.get_unassigned_literals()
         if unassigned_literals:
             chosen_literal = random.choice(unassigned_literals)
-            self.decision_level += 1
             assignment = random.choice([True, False])
             self.assignment[chosen_literal] = assignment
             self.decision_stack.append((chosen_literal, assignment, self.decision_level))
             print(f"Decision made: {chosen_literal} = {assignment} at level {self.decision_level}")
+            self.decision_level += 1
     
     def backjump(self):
         pass    
