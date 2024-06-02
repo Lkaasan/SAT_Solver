@@ -2,16 +2,10 @@ import sys
 import time
 import random
 
-
-class Node:
+# class ImplicationGraph:
     
-    def __init__(self, literal, type, level):
-        self.literal = literal
-        self.type = type
-        self.pointed_at = []
-        self.pointing_to = []
-        self.level = level
-        
+#     def __init__(self):
+
 class CDCL:
     
     def __init__(self):
@@ -21,6 +15,7 @@ class CDCL:
         self.learned_clauses = []
         self.decision_stack = []
         self.decision_level = 0
+        self.implication_graph = {}
     
     def add_clause(self, clause):
         if len(clause) == 1:
@@ -48,6 +43,7 @@ class CDCL:
             print(self.decision_stack)
             self.unit_propogation()
             if (self.conflict_analysis()):
+                print("conflict")
                 if (self.decision_level == 0):
                     return False
                 self.backtack()
@@ -107,11 +103,30 @@ class CDCL:
                 
     
     def assign_unit_clause(self, clause):
+        implication = []
+        l = None  # Initialize l to None to handle the case where it's not updated
+
         for literal in clause:
             if abs(literal) not in self.assignment:
                 assignment = literal > 0
                 self.assignment[abs(literal)] = assignment
-                self.decision_stack.append((abs(literal), assignment, self.decision_level))
+                l = abs(literal)
+                self.decision_stack.append((abs(literal), assignment, self.decision_level, "Implication"))
+            else:
+                implication.append(abs(literal))
+
+        if l is not None:
+            if len(clause) == 1:
+                self.implication_graph[abs(clause[0])] = []
+            
+            for x in implication:
+                if x in self.implication_graph:
+                    self.implication_graph[x].append(l)
+                else:
+                    self.implication_graph[x] = [l]
+            self.implication_graph[l] = []
+
+                
                             
     def conflict_analysis(self):    
         conflicting_clauses = []
@@ -121,6 +136,11 @@ class CDCL:
         if conflicting_clauses == []:
             return False
         else:
+            print(conflicting_clauses)
+            print(self.decision_stack)
+            # print(self.decision_stack)
+            # print(self.assignment)
+            # print(self.get_clauses())
             return True
     
     
@@ -133,7 +153,8 @@ class CDCL:
             chosen_literal = random.choice(unassigned_literals)
             assignment = random.choice([True, False])
             self.assignment[chosen_literal] = assignment
-            self.decision_stack.append((chosen_literal, assignment, self.decision_level))
+            self.decision_stack.append((chosen_literal, assignment, self.decision_level, "Decision"))
+            self.implication_graph[chosen_literal] = []
             print(f"Decision made: {chosen_literal} = {assignment} at level {self.decision_level}")
             self.decision_level += 1
     
@@ -174,3 +195,5 @@ if __name__ == "__main__":
     print("Time taken to solve:", end_time - start_time, "seconds")
     print("Assignment:", solver.assignment)
     print(solver.clauses)
+    print(solver.decision_stack)
+    print(solver.implication_graph)
