@@ -104,7 +104,7 @@ class CDCL:
     
     def assign_unit_clause(self, clause):
         implication = []
-        l = None  # Initialize l to None to handle the case where it's not updated
+        l = None  
 
         for literal in clause:
             if abs(literal) not in self.assignment:
