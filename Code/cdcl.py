@@ -39,14 +39,18 @@ class CDCL:
     
     def dpll(self):
         while True:
-            time.sleep(1)
+            # time.sleep(1)
             print(self.decision_stack)
-            self.unit_propogation()
-            if (self.conflict_analysis()):
-                print("conflict")
-                if (self.decision_level == 0):
-                    return False
-                self.backtack()
+            unit_propagation_result = self.unit_propogation()
+            # if (self.conflict_analysis()):
+            #     print("conflict")
+            #     if (self.decision_level == 0):
+            #         return False
+            #     self.backtack()
+            if unit_propagation_result != "Done":
+                new_clause = self.learn_clause(unit_propagation_result)
+                # self.backtrack(new_clause)
+                return False
             elif not self.get_unassigned_literals():
                 return True
             else:
@@ -96,12 +100,14 @@ class CDCL:
     def unit_propogation(self):
         while True:
             for clause in self.clauses:
+                conflict = self.conflict_analysis()
+                if conflict != False:
+                    return [clause, conflict]
                 if self.clauses.get(clause) == "Unit":
                     self.assign_unit_clause(clause)
             if self.change_clause_states() == False:
-                break
-                
-    
+                return "Done"
+            
     def assign_unit_clause(self, clause):
         implication = []
         l = None  
@@ -125,27 +131,26 @@ class CDCL:
                 else:
                     self.implication_graph[x] = [l]
             self.implication_graph[l] = []
-
                 
-                            
     def conflict_analysis(self):    
-        conflicting_clauses = []
+        # conflicting_clauses = []
         for clause in self.clauses:
             if self.clauses.get(clause) == "Conflict":
-                conflicting_clauses.append(clause)
-        if conflicting_clauses == []:
-            return False
-        else:
-            print(conflicting_clauses)
-            print(self.decision_stack)
-            # print(self.decision_stack)
-            # print(self.assignment)
-            # print(self.get_clauses())
-            return True
-    
+                # conflicting_clauses.append(clause)
+                return clause
+        # if conflicting_clauses == []:
+        #     return False
+        # else:
+        #     print(conflicting_clauses)
+        #     print(self.decision_stack)
+        #     # print(self.decision_stack)
+        #     # print(self.assignment)
+        #     # print(self.get_clauses())
+        #     return True
+        return False
     
     def learn_clause(self, clauses):
-        pass
+        print(clauses)
     
     def make_decision(self):
         unassigned_literals = self.get_unassigned_literals()
@@ -158,7 +163,7 @@ class CDCL:
             print(f"Decision made: {chosen_literal} = {assignment} at level {self.decision_level}")
             self.decision_level += 1
     
-    def backjump(self):
+    def backjump(self, learned_clause):
         pass    
           
 def read_dimacs_file(filename):
