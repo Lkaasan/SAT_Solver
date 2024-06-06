@@ -98,15 +98,20 @@ class CDCL:
             return False           
     
     def unit_propogation(self):
+        last_clause = None
         while True:
             for clause in self.clauses:
                 conflict = self.conflict_analysis()
                 if conflict != False:
-                    return [clause, conflict]
+                    if last_clause == None:
+                        return [clause, conflict]
+                    else: 
+                        return[last_clause, conflict]
                 if self.clauses.get(clause) == "Unit":
                     self.assign_unit_clause(clause)
-            if self.change_clause_states() == False:
-                return "Done"
+                if self.change_clause_states() == False:
+                    return "Done"
+                last_clause = clause
             
     def assign_unit_clause(self, clause):
         implication = []
@@ -151,6 +156,7 @@ class CDCL:
     
     def learn_clause(self, clauses):
         print(clauses)
+        print(self.decision_stack[len(self.decision_stack) - 1])
     
     def make_decision(self):
         unassigned_literals = self.get_unassigned_literals()
