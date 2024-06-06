@@ -49,7 +49,10 @@ class CDCL:
             #     self.backtack()
             if unit_propagation_result != "Done":
                 new_clause = self.learn_clause(unit_propagation_result)
-                # self.backtrack(new_clause)
+                self.backjump(new_clause)
+                # print(self.decision_stack)
+                # print(self.decision_level)
+                print(new_clause)
                 return False
             elif not self.get_unassigned_literals():
                 return True
@@ -155,9 +158,31 @@ class CDCL:
         return False
     
     def learn_clause(self, clauses):
-        print(clauses)
-        print(self.decision_stack[len(self.decision_stack) - 1])
-    
+        # print(clauses)
+        conflicting_assignment = self.decision_stack[-1]
+        # print(conflicting_assignment)
+        conflicting_condition = self.get_cut_literals(conflicting_assignment[0])
+        # print(conflicting_condition)
+        learned_clause = []
+        for literal in conflicting_condition:
+            # print(literal)
+            if literal[1] == False:
+                learned_clause.append(literal[0])
+            else:
+                learned_clause.append(0 - literal[0])
+        # print(learned_clause)
+        self.add_clause(learned_clause)
+        return learned_clause
+            
+    def get_cut_literals(self, assigned_literal):
+        conflicting_condition_literals = []
+        for implication in self.implication_graph:
+            if assigned_literal in self.implication_graph[implication]:
+                literal = implication
+                assignment = self.assignment.get(literal)
+                conflicting_condition_literals.append([literal, assignment])
+        return conflicting_condition_literals
+
     def make_decision(self):
         unassigned_literals = self.get_unassigned_literals()
         if unassigned_literals:
@@ -170,7 +195,35 @@ class CDCL:
             self.decision_level += 1
     
     def backjump(self, learned_clause):
-        pass    
+        print(self.decision_stack)
+        print(self.implication_graph)
+        second_highest_dl = -1
+        highest_dl = -1
+        for assignment in self.decision_stack:
+            x = assignment[2]
+            print(x)
+            if x > highest_dl:
+                second_highest_dl = highest_dl
+                highest_dl = x
+            elif x > second_highest_dl:
+                second_highest_dl = x
+        print("SH: " , second_highest_dl)
+        while True:
+            decision = self.decision_stack[-1]
+            if decision[2] > second_highest_dl:
+                self.decision_stack.pop()
+                del self.assignment[decision[0]]
+                temp = self.implication_graph
+                for i in self.implication_graph:
+                    if i == decision[0]:
+                        del temp[decision[0]]
+                    else:
+                        if i in self.implication_graph[decision[0]]:
+                            temp.remove(decision[0])
+                self.implication_graph = temp
+            else:
+                break
+
           
 def read_dimacs_file(filename):
     cnf_formula = []
@@ -204,7 +257,8 @@ if __name__ == "__main__":
         print("Unsatisfiable")
     end_time = time.time()
     print("Time taken to solve:", end_time - start_time, "seconds")
-    print("Assignment:", solver.assignment)
-    print(solver.clauses)
+    # print("Assignment:", solver.assignment)
+    # print(solver.clauses)
+    print("-----------------------------------------------------")
     print(solver.decision_stack)
     print(solver.implication_graph)
