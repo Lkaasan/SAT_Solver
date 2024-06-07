@@ -40,7 +40,7 @@ class CDCL:
     def dpll(self):
         while True:
             # time.sleep(1)
-            print(self.decision_stack)
+            # print(self.decision_stack)
             unit_propagation_result = self.unit_propogation()
             # if (self.conflict_analysis()):
             #     print("conflict")
@@ -195,21 +195,36 @@ class CDCL:
             self.decision_level += 1
     
     def backjump(self, learned_clause):
+        print(learned_clause)
         print(self.decision_stack)
         print(self.implication_graph)
-        second_highest_dl = -1
-        highest_dl = -1
-        for assignment in self.decision_stack:
-            x = assignment[2]
-            print(x)
-            if x > highest_dl:
-                second_highest_dl = highest_dl
-                highest_dl = x
-            elif x > second_highest_dl:
-                second_highest_dl = x
+        for i in range(0, len(learned_clause)):
+            learned_clause[i] = abs(learned_clause[i])
+        decision_levels = []
+        for d in self.decision_stack:
+            if d[0] in learned_clause:
+                decision_levels.append(d[2])
+        print(decision_levels)
+        second_highest_dl = 0
+        highest_dl = 0
+        if len(decision_levels) == 1:
+            second_highest_dl = decision_levels[0]
+        elif len(decision_levels) == 2:
+            second_highest_dl = min(decision_levels)
+        else:
+            for x in decision_levels:
+                print(x)
+                if x > second_highest_dl:
+                    second_highest_dl = x
+                if x > highest_dl:
+                    second_highest_dl = highest_dl
+                    highest_dl = x
         print("SH: " , second_highest_dl)
         while True:
             decision = self.decision_stack[-1]
+            print(decision)
+            print(decision[2])
+            print(decision[0])
             if decision[2] > second_highest_dl:
                 self.decision_stack.pop()
                 del self.assignment[decision[0]]
