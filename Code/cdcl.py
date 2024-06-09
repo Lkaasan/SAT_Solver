@@ -1,6 +1,7 @@
 import sys
 import time
 import random
+from collections import deque
 
 # class ImplicationGraph:
     
@@ -39,24 +40,29 @@ class CDCL:
     
     def dpll(self):
         while True:
-            # time.sleep(0.5)
-            # print(self.decision_stack)
             unit_propagation_result = self.unit_propogation()
             if unit_propagation_result != "Done":
-                print("Results: ", unit_propagation_result)
                 if self.decision_level == 0:
                     return False
                 else:
+                    if len(self.decision_stack) > 0:
+                        self.decision_level += 1
                     new_clause = self.learn_clause(unit_propagation_result)
                     self.backjump(new_clause)
-                    print(new_clause)
                     self.change_clause_states()
-            elif not self.get_unassigned_literals():
+            elif self.check_finish():
                 return True
             else:
+                if len(self.decision_stack) > 0:
+                    self.decision_level += 1
                 self.make_decision()
-                self.decision_level += 1
                 self.change_clause_states()
+                
+    def check_finish(self):
+        for x in self.clauses:
+            if self.clauses[x] != 'Resolved':
+                return False
+        return True
             
     def change_clause_states(self):
         unit_change = False
@@ -105,9 +111,11 @@ class CDCL:
                 conflict = self.conflict_analysis()
                 if conflict != False:
                     if last_clause == None:
-                        return [clause, conflict]
+                        # return [clause, conflict]
+                        return conflict
                     else: 
-                        return[last_clause, conflict]
+                        return conflict
+                        # return[last_clause, conflict]
                 if self.clauses.get(clause) == "Unit":
                     self.assign_unit_clause(clause)
                 if self.change_clause_states() == False:
@@ -144,35 +152,40 @@ class CDCL:
                 return clause
         return False
     
-    def learn_clause(self, clauses):
-        print(clauses)
-        conflicting_assignment = self.decision_stack[-1]
-        conflict_literal = conflicting_assignment[0]
-        conflicting_condition = self.get_cut_literals(conflict_literal)
-        check = []
-        for x in conflicting_condition:
-            check.append(x[0])
-        for x in clauses[1]:
-            if abs(x) not in check and abs(x) != conflict_literal:
-                conflicting_condition.append([abs(x), self.assignment[abs(x)]])
-        learned_clause = []
-        for literal in conflicting_condition:
-            if literal[1] == False:
-                learned_clause.append(literal[0])
-            else:
-                learned_clause.append(0 - literal[0])
-        self.add_clause(learned_clause)
-        return learned_clause
+    def learn_clause(self, clause):
+        print(clause)
+        conflicting_literal = self.decision_stack[-1][0]
+        # included_variables = []
+        # learned_clause = []
+        # for x in clauses[0]:
+        #     if abs(x) not in included_variables and abs(x) != conflicting_literal:
+        #         included_variables.append(abs(x))
+        #         learned_clause.append(x)
+        # for x in clauses[1]:
+        #     if abs(x) not in included_variables and abs(x) != conflicting_literal:
+        #         included_variables.append(abs(x))
+        #         learned_clause.append(x)        
+        # if tuple(learned_clause) not in self.clauses:
+        #     self.add_clause(learned_clause)
+        # return learned_clause
+        conflicting_decisions = self.get_cut_literals(clause)
             
-    def get_cut_literals(self, assigned_literal):
+    def get_cut_literals(self, clause):
+        print(self.implication_graph)
+        print(self.assignment)
         conflicting_condition_literals = []
-        for implication in self.implication_graph:
-            if assigned_literal in self.implication_graph[implication]:
-                literal = implication
-                assignment = self.assignment.get(literal)
-                conflicting_condition_literals.append([literal, assignment])
-        return conflicting_condition_literals
-
+        decisions = []
+        for d in self.decision_stack:
+            if d[3] == 'Decision':
+                decisions.append(d[0])
+        for literal in clause:
+            l = abs(literal)
+            queue = deque()
+  
+                
+            
+        
+   
     def make_decision(self):
         unassigned_literals = self.get_unassigned_literals()
         if unassigned_literals:
@@ -182,47 +195,59 @@ class CDCL:
             self.decision_stack.append((chosen_literal, assignment, self.decision_level, "Decision"))
             self.implication_graph[chosen_literal] = []
             # print(f"Decision made: {chosen_literal} = {assignment} at level {self.decision_level}")
-    
-    def backjump(self, learned_clause):
-        print(self.decision_stack)
-        for i in range(0, len(learned_clause)):
-            learned_clause[i] = abs(learned_clause[i])
-        decision_levels = []
-        for d in self.decision_stack:
-            if d[0] in learned_clause:
-                decision_levels.append(d[2])
-        second_highest_dl = 0
-        highest_dl = 0
-        if len(decision_levels) == 1:
-            second_highest_dl = decision_levels[0]
-        elif len(decision_levels) == 2:
-            second_highest_dl = min(decision_levels)
-        else:
-            for x in decision_levels:
-                if x > highest_dl:
-                    second_highest_dl = highest_dl
-                    highest_dl = x
-        print("SH: " , second_highest_dl)
-        if second_highest_dl == self.decision_level:
-            second_highest_dl -= 1
-        while True:
-            decision = self.decision_stack[-1]
-            if decision[2] > second_highest_dl:
-                self.decision_stack.pop()
-                del self.assignment[decision[0]]
-                temp = self.implication_graph
-                for i in self.implication_graph:
-                    if decision[0] in self.implication_graph[i]:
-                        temp[i].remove(decision[0])
-                temp.pop(decision[0])
-                self.implication_graph = temp
-            else:
-                break
-        self.decision_level = second_highest_dl
-        print(self.assignment)
-        print(self.decision_stack)
-        print(self.implication_graph)
 
+    def backjump(self, learned_clause):
+        print(learned_clause)
+        if len(learned_clause) == 1:
+            self.implication_graph = []
+            self.assignment = {}
+            self.decision_stack = []
+        else:
+            print(self.decision_stack)
+            for i in range(0, len(learned_clause)):
+                learned_clause[i] = abs(learned_clause[i])
+            decision_levels = []
+            for d in self.decision_stack:
+                if d[0] in learned_clause:
+                    decision_levels.append(d[2])
+            second_highest_dl = 0
+            highest_dl = 0
+            if len(decision_levels) == 1:
+                second_highest_dl = decision_levels[0]
+            elif len(decision_levels) == 2:
+                second_highest_dl = min(decision_levels)
+            else:
+                for x in decision_levels:
+                    if x > highest_dl:
+                        second_highest_dl = highest_dl
+                        highest_dl = x
+            print(decision_levels)
+            print("SH: " , second_highest_dl)
+            print("decision levels: ", self.decision_level)
+            if second_highest_dl == self.decision_stack[-1][2]:
+                second_highest_dl -= 1
+            elif max(decision_levels) == min(decision_levels) and second_highest_dl != 0:
+                second_highest_dl = max(decision_levels) - 1
+            if second_highest_dl == 0:
+                self.implication_graph = []
+                self.assignment = {}
+                self.decision_stack = []
+            else:
+                while True:
+                    decision = self.decision_stack[-1]
+                    if decision[2] > second_highest_dl:
+                        self.decision_stack.pop()
+                        del self.assignment[decision[0]]
+                        temp = self.implication_graph
+                        for i in self.implication_graph:
+                            if decision[0] in self.implication_graph[i]:
+                                temp[i].remove(decision[0])
+                        temp.pop(decision[0])
+                        self.implication_graph = temp
+                    else:
+                        break
+                self.decision_level = second_highest_dl
+                print(self.decision_stack)
           
 def read_dimacs_file(filename):
     cnf_formula = []
@@ -257,7 +282,7 @@ if __name__ == "__main__":
     end_time = time.time()
     print("Time taken to solve:", end_time - start_time, "seconds")
     print("Assignment:", solver.assignment)
-    # print(solver.clauses)
+    print(solver.clauses)
     print("-----------------------------------------------------")
     print(solver.decision_stack)
-    print(solver.implication_graph)
+    # print(solver.implication_graph)
