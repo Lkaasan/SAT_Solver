@@ -41,8 +41,9 @@ class CDCL:
     def dpll(self):
         while True:
             unit_propagation_result = self.unit_propogation()
+            print(unit_propagation_result)
             if unit_propagation_result != "Done":
-                if self.decision_level == 0:
+                if self.decision_stack[-1][2] == 0:
                     return False
                 else:
                     if len(self.decision_stack) > 0:
@@ -53,6 +54,7 @@ class CDCL:
             elif self.check_finish():
                 return True
             else:
+                print("LOL", self.decision_level)
                 if len(self.decision_stack) > 0:
                     self.decision_level += 1
                 self.make_decision()
@@ -104,23 +106,42 @@ class CDCL:
         else:
             return False           
     
+    # def unit_propogation(self):
+    #     last_clause = None
+    #     while True:
+    #         print(counter)
+    #         for clause in self.clauses:
+    #             conflict = self.conflict_analysis()
+    #             print(conflict)
+    #             if conflict != False:
+    #                 if last_clause == None:
+    #                     # return [clause, conflict]
+    #                     return conflict
+    #                 else: 
+    #                     return conflict
+    #                     # return[last_clause, conflict]
+    #             if self.clauses.get(clause) == "Unit":
+    #                 self.assign_unit_clause(clause)
+    #                 break
+    #             if self.change_clause_states() == False:
+    #                 print(self.clauses)
+    #                 return "Done"
+    #             last_clause = clause
+    #         counter += 1
+    
     def unit_propogation(self):
-        last_clause = None
+        finish = False
         while True:
             for clause in self.clauses:
                 conflict = self.conflict_analysis()
                 if conflict != False:
-                    if last_clause == None:
-                        # return [clause, conflict]
-                        return conflict
-                    else: 
-                        return conflict
-                        # return[last_clause, conflict]
-                if self.clauses.get(clause) == "Unit":
-                    self.assign_unit_clause(clause)
-                if self.change_clause_states() == False:
-                    return "Done"
-                last_clause = clause
+                    return conflict
+                else:
+                    if self.clauses.get(clause) == "Unit":
+                        self.assign_unit_clause(clause)
+                        self.change_clause_states()
+                        break
+            return "Done"
             
     def assign_unit_clause(self, clause):
         implication = []
@@ -153,7 +174,6 @@ class CDCL:
         return False
     
     def learn_clause(self, clause):
-        print(clause)
         conflicting_literal = self.decision_stack[-1][0]
         # included_variables = []
         # learned_clause = []
@@ -169,10 +189,19 @@ class CDCL:
         #     self.add_clause(learned_clause)
         # return learned_clause
         conflicting_decisions = self.get_cut_literals(clause)
+        learned_clause = []
+        for l in conflicting_decisions:
+            if self.assignment[l] == False:
+                learned_clause.append(l)
+            else:
+                learned_clause.append(0 - l)
+        print(self.assignment)
+        print(learned_clause)
+        return learned_clause
+                
+                
             
     def get_cut_literals(self, clause):
-        print(self.implication_graph)
-        print(self.assignment)
         conflicting_condition_literals = []
         decisions = []
         for d in self.decision_stack:
@@ -181,11 +210,20 @@ class CDCL:
         for literal in clause:
             l = abs(literal)
             queue = deque()
-  
-                
-            
-        
-   
+            queue.append(l)
+            while len(queue) != 0:
+                for x in range(0, len(queue)):
+                    temp = queue.popleft()
+                    if temp in decisions and temp not in conflicting_condition_literals:
+                        conflicting_condition_literals.append(temp)
+                    else:
+                        print(self.implication_graph)
+                        for i in self.implication_graph:
+                            if temp in self.implication_graph[i]:
+                                queue.append(i)
+        print("conflicting decisions: ", conflicting_condition_literals)
+        return conflicting_condition_literals
+                            
     def make_decision(self):
         unassigned_literals = self.get_unassigned_literals()
         if unassigned_literals:
@@ -197,13 +235,11 @@ class CDCL:
             # print(f"Decision made: {chosen_literal} = {assignment} at level {self.decision_level}")
 
     def backjump(self, learned_clause):
-        print(learned_clause)
         if len(learned_clause) == 1:
             self.implication_graph = []
             self.assignment = {}
             self.decision_stack = []
         else:
-            print(self.decision_stack)
             for i in range(0, len(learned_clause)):
                 learned_clause[i] = abs(learned_clause[i])
             decision_levels = []
