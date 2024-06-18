@@ -17,6 +17,7 @@ class CDCL:
         self.decision_stack = []
         self.decision_level = 0
         self.implication_graph = {}
+        self.literals_polarities = {}
         if heuristic == True:
             self.heuristic = True
         else:
@@ -30,8 +31,14 @@ class CDCL:
         for literal in clause:
             if abs(literal) in self.literals.keys():
                 self.literals[abs(literal)] += 1
+                self.literals_polarities[literal] += 1
             else:
-                self.literals[abs(literal)] = 0
+                self.literals_polarities[literal] = 1
+                if literal < 0:
+                    self.literals_polarities[abs(literal)] = 0
+                else:
+                    self.literals_polarities[0 - literal] = 0
+                self.literals[abs(literal)] = 1
     
     def get_clauses(self):
         return self.clauses
@@ -77,15 +84,26 @@ class CDCL:
                 if (literal > 0 and self.assignment.get(abs(literal)) is True) or (literal < 0 and self.assignment.get(abs(literal)) is False):
                     clause_satisfied = True
                     if self.clauses[clause] != "Resolved":
+                        for l in clause:
+                            self.literals[abs(l)] -= 1
                         self.clauses[clause] = "Resolved"
                     break
             if not clause_satisfied:
                 if self.check_unit_clause(clause):
+                    if self.clauses[clause] == "Resolved":
+                        for l in clause:
+                            self.literals[abs(l)] += 1
                     self.clauses[clause] = "Unit"
                     unit_change = True
                 elif self.check_conflict_clause(clause) == True:
+                    if self.clauses[clause] == "Resolved":
+                        for l in clause:
+                            self.literals[abs(l)] += 1
                     self.clauses[clause] = "Conflict"
                 else:
+                    if self.clauses[clause] == "Resolved":
+                        for l in clause:
+                            self.literals[abs(l)] += 1
                     self.clauses[clause] = "Unresolved"
         return unit_change
         
@@ -122,7 +140,6 @@ class CDCL:
                     return clause  
             if found_unit == False:
                 return "Done"
-
             
     def assign_unit_clause(self, clause):
         implication = []
@@ -190,12 +207,32 @@ class CDCL:
     def make_decision(self):
         unassigned_literals = self.get_unassigned_literals()
         if unassigned_literals:
-            chosen_literal = random.choice(unassigned_literals)
-            assignment = random.choice([True, False])
+            if self.heuristic == False:
+                chosen_literal = random.choice(unassigned_literals)
+                assignment = random.choice([True, False])
+            else:
+                chosen_literal, assignment = self.make_choice_with_heuristic(unassigned_literals)
             self.assignment[chosen_literal] = assignment
             self.decision_stack.append((chosen_literal, assignment, self.decision_level, "Decision"))
             self.implication_graph[chosen_literal] = []
-            # print(f"Decision made: {chosen_literal} = {assignment} at level {self.decision_level}")
+    
+    def make_choice_with_heuristic(self, unassigned_literals):
+        max_literals = []
+        max_occurance = 0
+        for l in unassigned_literals:
+            occurance = self.literals.get(abs(l))
+            if occurance > max_occurance:
+                max_literals = []
+                max_literals.append(l)
+                max_occurance = occurance
+            elif occurance == max_occurance:
+                max_literals.append(l)
+        decision = random.choice(max_literals)
+        if self.literals_polarities[decision] > self.literals_polarities[0 - decision]:
+            assignment = True
+        else:
+            assignment = False
+        return decision, assignment
 
     def backjump(self, learned_clause):
         if len(learned_clause) == 1:
@@ -255,14 +292,17 @@ def read_dimacs_file(filename):
 if __name__ == "__main__":
     
     if len(sys.argv) != 3:
-        print("Usage: py cdcl.py <filename.txt>")
+        print("Usage: py cdcl.py <filename.txt> <h/nh>")
         print("Where <filename.txt> is a CNF DIMACS equation")
         sys.exit(1)
     
     filename = sys.argv[1]
     cnf_formula = read_dimacs_file(filename)
     start_time = time.time()
-    solver = CDCL()
+    if sys.argv[2]  == 'h':
+        solver = CDCL(True)
+    else:
+        solver = CDCL(False)
     for clause in cnf_formula:
         solver.add_clause(clause)
     # print(solver.get_literals())
@@ -271,7 +311,6 @@ if __name__ == "__main__":
         print("Satisfiable")
     else:
         print("Unsatisfiable")
-        print(solver.get_clauses())
     end_time = time.time()
     print("Time taken to solve:", end_time - start_time, "seconds")
     print("Assignment:", solver.assignment)
