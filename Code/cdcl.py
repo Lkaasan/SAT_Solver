@@ -293,7 +293,7 @@ if __name__ == "__main__":
     
     if len(sys.argv) != 3:
         print("Usage: py cdcl.py <filename.txt> <h/nh>")
-        print("Where <filename.txt> is a CNF DIMACS equation")
+        print("Where <filename.txt> is a CNF DIMACS equation and <h/nh> is heuristic/no heuristic")
         sys.exit(1)
     
     filename = sys.argv[1]
@@ -305,7 +305,6 @@ if __name__ == "__main__":
         solver = CDCL(False)
     for clause in cnf_formula:
         solver.add_clause(clause)
-    # print(solver.get_literals())
     
     if solver.dpll():
         print("Satisfiable")
@@ -316,5 +315,8 @@ if __name__ == "__main__":
     print("Assignment:", solver.assignment)
     # print(solver.clauses)
     print("-----------------------------------------------------")
-    print(solver.decision_stack)
+    print("Decision Stack: ", solver.decision_stack)
+    print("-----------------------------------------------------")
+
+    
     # print(solver.implication_graph)
