@@ -292,7 +292,7 @@ def read_dimacs_file(filename):
 if __name__ == "__main__":
     
     if len(sys.argv) != 3:
-        print("Usage: py cdcl.py <filename.txt> <h/nh>")
+        print("Usage: python3 cdcl.py <filename.txt> <h/nh>")
         print("Where <filename.txt> is a CNF DIMACS equation and <h/nh> is heuristic/no heuristic")
         sys.exit(1)
     
