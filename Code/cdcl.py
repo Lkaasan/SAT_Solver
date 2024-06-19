@@ -3,10 +3,6 @@ import time
 import random
 from collections import deque
 
-# class ImplicationGraph:
-    
-#     def __init__(self):
-
 class CDCL:
     
     def __init__(self, heuristic):
@@ -313,10 +309,8 @@ if __name__ == "__main__":
     end_time = time.time()
     print("Time taken to solve:", end_time - start_time, "seconds")
     print("Assignment:", solver.assignment)
-    # print(solver.clauses)
     print("-----------------------------------------------------")
     print("Decision Stack: ", solver.decision_stack)
     print("-----------------------------------------------------")
 
     
-    # print(solver.implication_graph)
