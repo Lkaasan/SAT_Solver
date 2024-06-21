@@ -42,6 +42,9 @@ class CDCL:
     def get_literals(self):
         return self.literals
     
+    def get_literal_polarities(self):
+        return self.literals_polarities
+    
     def get_unassigned_literals(self):
         return [literal for literal in self.literals if literal not in self.assignment]
     
@@ -287,30 +290,35 @@ def read_dimacs_file(filename):
 
 if __name__ == "__main__":
     
-    if len(sys.argv) != 3:
-        print("Usage: python3 cdcl.py <filename.txt> <h/nh>")
-        print("Where <filename.txt> is a CNF DIMACS equation and <h/nh> is heuristic/no heuristic")
+    if len(sys.argv) != 4 and (sys.argv[2] != "h" or sys.argv[2] != "nh"):
+        print("Usage: python3 cdcl.py <filename.txt> <h/nh> <repetitions>")
+        print("Where <filename.txt> is a CNF DIMACS equation and <h/nh> is heuristic/no heuristic and <repetitions> is how many times it should run")
         sys.exit(1)
     
     filename = sys.argv[1]
     cnf_formula = read_dimacs_file(filename)
-    start_time = time.time()
-    if sys.argv[2]  == 'h':
-        solver = CDCL(True)
-    else:
-        solver = CDCL(False)
-    for clause in cnf_formula:
-        solver.add_clause(clause)
-    
-    if solver.dpll():
-        print("Satisfiable")
-    else:
-        print("Unsatisfiable")
-    end_time = time.time()
-    print("Time taken to solve:", end_time - start_time, "seconds")
-    print("Assignment:", solver.assignment)
-    print("-----------------------------------------------------")
-    print("Decision Stack: ", solver.decision_stack)
-    print("-----------------------------------------------------")
+    repetitions = sys.argv[3]
+    total_time = 0.0
+    for i in range (0, int(repetitions)):
+        if sys.argv[2]  == "h":
+            solver = CDCL(True)
+        else:
+            solver = CDCL(False)
+        for clause in cnf_formula:
+            solver.add_clause(clause)
+        start_time = time.time()
+        if solver.dpll():
+            print("Satisfiable")
+        else:
+            print("Unsatisfiable")
+        end_time = time.time()
+        time_taken = end_time - start_time
+        total_time += time_taken
+        print("Time taken to solve:", end_time - start_time, "seconds")
+        print("Assignment:", solver.assignment)
+        print("-----------------------------------------------------")
+        print("Decision Stack: ", solver.decision_stack)
+        print("-----------------------------------------------------")
+    print("Average time: ", total_time / float(repetitions))
 
     
