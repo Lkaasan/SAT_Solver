@@ -9,7 +9,6 @@ class CDCL:
         self.literals = {}
         self.clauses = {}
         self.assignment = {}
-        self.learned_clauses = []
         self.decision_stack = []
         self.decision_level = 0
         self.implication_graph = {}
