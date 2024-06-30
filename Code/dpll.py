@@ -44,13 +44,8 @@ class DPLL:
         if self.check_satisfiability():
             return True
         elif self.check_conflict():
-            # print("conflict!")
             return False
         else: 
-            # print(self.assignment)
-            # print(self.clauses)
-            # print('---------------------------------------------------------------')
-            # time.sleep(0.1)
             if not bool(self.pure_literals) is not True:
                 print(self.pure_literals)
                 pure_literal = self.pure_literals.pop()
@@ -108,7 +103,6 @@ class DPLL:
                 return True
         return False
             
-
     def choose_literal(self, unassigned_literals):
         if unassigned_literals == []:
             unassigned_literals = [l for l in self.literals if l not in self.assignment]
@@ -164,7 +158,6 @@ class DPLL:
             if len(c) == 1:
                 self.pure_literals.append(c[0])
             
- 
     def check_satisfiability(self):
         r = True
         for clause in self.clauses:
@@ -229,7 +222,6 @@ def read_dimacs_file(filename):
             if clause:
                 cnf_formula.append(clause)
     return cnf_formula
-
 
 if __name__ == "__main__":
     start_time = time.time()
