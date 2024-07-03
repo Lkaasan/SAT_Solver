@@ -1,0 +1,34 @@
+<mxfile host="app.diagrams.net" modified="2024-07-01T10:15:46.326Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" etag="emFJZxmW1_DmIJIhnO2K" version="24.6.4" type="device">
+  <diagram name="Page-1" id="5FcmyF8UOshukP_bfsAU">
+    <mxGraphModel dx="1877" dy="556" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="7_SCH06HnqFM4idJNi_U-1" value="DPLL" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-20" y="90" width="300" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="7_SCH06HnqFM4idJNi_U-2" value="+ literals: Dictionary(key = literal, value = occurrences)&lt;div&gt;+ clauses: Dictionary(key = clause, value = clause status)&lt;/div&gt;&lt;div&gt;+ assignment: Dictionary(key = literal, value = True/False&amp;nbsp;&lt;/div&gt;&lt;div&gt;+ literal_polarities: Dictionary(key = literal/not literal, value = occurrences&lt;/div&gt;&lt;div&gt;+pure_literals = List(literal)&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="7_SCH06HnqFM4idJNi_U-1">
+          <mxGeometry y="26" width="300" height="144" as="geometry" />
+        </mxCell>
+        <mxCell id="7_SCH06HnqFM4idJNi_U-3" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="7_SCH06HnqFM4idJNi_U-1">
+          <mxGeometry y="170" width="300" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="7_SCH06HnqFM4idJNi_U-4" value="+add_clause(clause): void&lt;div&gt;+get_clauses(): Dictionary(clauses)&lt;/div&gt;&lt;div&gt;+get_assignment(): Dictionary(assignments)&lt;/div&gt;&lt;div&gt;+get_literal_polarities(): Dictionary(literal_polarities)&lt;/div&gt;&lt;div&gt;+ dpll(): boolean&lt;/div&gt;&lt;div&gt;+check_conflict(): boolean&amp;nbsp;&lt;/div&gt;&lt;div&gt;+choose_literal(unassigned_literals): literal&lt;/div&gt;&lt;div&gt;+find_unit_clause_literal(): literal/False&lt;/div&gt;&lt;div&gt;+populate_pure_literal(): void&lt;/div&gt;&lt;div&gt;+check_satisfiability(): boolean&lt;/div&gt;&lt;div&gt;+check_unit_clause(clause): boolean&lt;/div&gt;&lt;div&gt;+check_close_unit_clause(clause): boolean&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="7_SCH06HnqFM4idJNi_U-1">
+          <mxGeometry y="178" width="300" height="182" as="geometry" />
+        </mxCell>
+        <mxCell id="7_SCH06HnqFM4idJNi_U-9" value="CDCL" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="90" width="310" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="7_SCH06HnqFM4idJNi_U-10" value="+literals: Dictionary(key = literal, value = occurrences&lt;div&gt;+clauses: Dictionary(key = clause, value = clause status)&lt;/div&gt;&lt;div&gt;+assignment: Dictionary(key = clause, value = True/False&lt;/div&gt;&lt;div&gt;+decision_stack: List(decisions/implications)&lt;/div&gt;&lt;div&gt;+decision_level: int&lt;/div&gt;&lt;div&gt;+implication_graph: Dictionary(key = literal, value = List(literals))&lt;/div&gt;&lt;div&gt;+literal_polarities: Dictionary(key = literal/not literal, value = occurrences&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="7_SCH06HnqFM4idJNi_U-9">
+          <mxGeometry y="26" width="310" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="7_SCH06HnqFM4idJNi_U-11" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="7_SCH06HnqFM4idJNi_U-9">
+          <mxGeometry y="210" width="310" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="7_SCH06HnqFM4idJNi_U-12" value="+add_clause(clause): void&lt;div&gt;+get_clause(): Dictionary(clauses)&lt;/div&gt;&lt;div&gt;+get_literals(): Dictionary(literals)&lt;/div&gt;&lt;div&gt;+get_literal_polarities(): Dictionary(literals)&lt;/div&gt;&lt;div&gt;+get_unassigned_literals(): List(literals)&lt;/div&gt;&lt;div&gt;+dpll(): void&lt;/div&gt;&lt;div&gt;+check_finish(): boolean&lt;/div&gt;&lt;div&gt;+change_clause_states(): boolean&lt;/div&gt;&lt;div&gt;+check_conflict_clause(clause): boolean&amp;nbsp;&lt;/div&gt;&lt;div&gt;+check_unit_clause(clause): boolean&lt;/div&gt;&lt;div&gt;+unit_propagation(): clause/&quot;Done&quot;&lt;/div&gt;&lt;div&gt;+assign_unit_clause(clause): void&amp;nbsp;&lt;/div&gt;&lt;div&gt;+conflict_analysis(): conflicting clause/False&lt;/div&gt;&lt;div&gt;+learn_clause(clause): learned clause&lt;/div&gt;&lt;div&gt;+get_cut_literals(clause):List(literal)&lt;/div&gt;&lt;div&gt;+make_decision(): void&lt;/div&gt;&lt;div&gt;+make_choice_without_heuristic(unassigned_literals): literal &amp;amp; assignment&lt;/div&gt;&lt;div&gt;+backjump(learned clause): void&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="7_SCH06HnqFM4idJNi_U-9">
+          <mxGeometry y="218" width="310" height="282" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

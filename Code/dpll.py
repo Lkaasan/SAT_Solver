@@ -47,7 +47,6 @@ class DPLL:
             return False
         else: 
             if not bool(self.pure_literals) is not True:
-                print(self.pure_literals)
                 pure_literal = self.pure_literals.pop()
                 if pure_literal < 0:
                     self.assignment[abs(pure_literal)] = False
