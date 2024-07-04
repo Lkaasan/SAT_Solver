@@ -102,23 +102,23 @@ class DPLL:
                 return True
         return False
             
-    def choose_literal(self, unassigned_literals):
-        if unassigned_literals == []:
+    def choose_literal(self, literals):
+        if literals == []:
             unassigned_literals = [l for l in self.literals if l not in self.assignment]
             max_literal = max(unassigned_literals, key=self.literals.get)
             max_value = self.literals.get(max_literal)
             max_variables = [l for l in unassigned_literals if self.literals.get(l) == max_value]
             return random.choice(max_variables)
-        elif unassigned_literals != []:
+        elif literals != []:
             max_literals = []
-            max_occurance = 0
-            for l in unassigned_literals:
-                occurance = self.literals.get(abs(l))
-                if occurance > max_occurance:
+            max_occurrence = 0
+            for l in literals:
+                occurrence = self.literals.get(abs(l))
+                if occurrence > max_occurrence:
                     max_literals = []
                     max_literals.append(l)
-                    max_occurance = occurance
-                elif occurance == max_occurance:
+                    max_occurrence = occurrence
+                elif occurrence == max_occurrence:
                     max_literals.append(l)
             return random.choice(max_literals)
         else:
