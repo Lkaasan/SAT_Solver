@@ -216,14 +216,14 @@ class CDCL:
     
     def make_choice_with_heuristic(self, unassigned_literals):
         max_literals = []
-        max_occurance = 0
+        max_occurrence = 0
         for l in unassigned_literals:
-            occurance = self.literals.get(abs(l))
-            if occurance > max_occurance:
+            occurrence = self.literals.get(abs(l))
+            if occurrence > max_occurrence:
                 max_literals = []
                 max_literals.append(l)
-                max_occurance = occurance
-            elif occurance == max_occurance:
+                max_occurrence = occurrence
+            elif occurrence == max_occurrence:
                 max_literals.append(l)
         decision = random.choice(max_literals)
         if self.literals_polarities[decision] > self.literals_polarities[0 - decision]:
