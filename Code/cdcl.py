@@ -129,13 +129,14 @@ class CDCL:
         while True:
             found_unit = False
             for clause in self.clauses:
+                conflict = self.conflict_analysis()
+                if conflict != False:
+                    return conflict  
                 if self.clauses[clause] == "Unit":
                     self.assign_unit_clause(clause)
                     self.change_clause_states()
                     found_unit = True
                     break
-                if self.clauses[clause] == "Conflict":
-                    return clause  
             if found_unit == False:
                 return "Done"
             
@@ -170,7 +171,6 @@ class CDCL:
         return False
     
     def learn_clause(self, clause):
-        conflicting_literal = self.decision_stack[-1][0]
         conflicting_decisions = self.get_cut_literals(clause)
         learned_clause = []
         for l in conflicting_decisions:
@@ -274,7 +274,7 @@ class CDCL:
                         self.implication_graph = temp
                     else:
                         break
-                self.decision_level = second_highest_dl
+            self.decision_level = second_highest_dl
           
 def read_dimacs_file(filename):
     cnf_formula = []
