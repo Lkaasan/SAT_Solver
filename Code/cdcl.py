@@ -251,19 +251,22 @@ class CDCL:
                 second_highest_dl = decision_levels[0]
             elif len(decision_levels) == 2:
                 second_highest_dl = min(decision_levels)
+            elif max(decision_levels) == min(decision_levels) and second_highest_dl != 0:
+                second_highest_dl = max(decision_levels) - 1
             else:
                 for x in decision_levels:
                     if x > highest_dl:
                         second_highest_dl = highest_dl
                         highest_dl = x
-            if second_highest_dl == self.decision_stack[-1][2]:
-                second_highest_dl -= 1
-            elif max(decision_levels) == min(decision_levels) and second_highest_dl != 0:
-                second_highest_dl = max(decision_levels) - 1
+            if second_highest_dl == 0:
+                self.implication_graph.clear()
+                self.assignment.clear()
+                self.decision_stack.clear()
+                self.decision_level = 0
             else:
                 while True:
                     decision = self.decision_stack[-1]
-                    if decision[2] > second_highest_dl:
+                    if decision[2] >= second_highest_dl:
                         self.decision_stack.pop()
                         del self.assignment[decision[0]]
                         temp = self.implication_graph
@@ -274,7 +277,6 @@ class CDCL:
                         self.implication_graph = temp
                     else:
                         break
-            self.decision_level = second_highest_dl
           
 def read_dimacs_file(filename):
     cnf_formula = []
