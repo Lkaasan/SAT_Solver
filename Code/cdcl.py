@@ -277,7 +277,8 @@ class CDCL:
                         self.implication_graph = temp
                     else:
                         break
-            self.decision_level = second_highest_dl - 1
+            if second_highest_dl != 0: 
+                self.decision_level = second_highest_dl - 1
           
 def read_dimacs_file(filename):
     cnf_formula = []
