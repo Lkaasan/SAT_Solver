@@ -53,6 +53,7 @@ class CDCL:
             unit_propagation_result = self.unit_propagation()
             if unit_propagation_result != "Done":
                 if self.decision_stack[-1][2] == 0:
+                    print(unit_propagation_result)
                     return False
                 else:
                     if len(self.decision_stack) > 0:
