@@ -102,6 +102,7 @@ class DPLL:
                 return True
         return False
             
+
     def choose_literal(self, literals):
         if literals == []:
             unassigned_literals = [l for l in self.literals if l not in self.assignment]
@@ -121,8 +122,6 @@ class DPLL:
                 elif occurrence == max_occurrence:
                     max_literals.append(l)
             return random.choice(max_literals)
-        else:
-            return None
         
     def find_unit_clause_literal(self):
         unit_literals = []
@@ -137,7 +136,7 @@ class DPLL:
                 for literal in c:
                     if abs(literal) not in self.assignment:
                         if abs(literal) not in one_off_unit_literals:
-                            one_off_unit_literals.append(literal)
+                            one_off_unit_literals.append(abs(literal))
         if unit_literals != []:
             return random.choice(unit_literals)
         elif one_off_unit_literals != []:
@@ -234,8 +233,6 @@ if __name__ == "__main__":
     solver = DPLL()
     for clause in cnf:
         solver.add_clause(clause)
-    print(solver.get_literals())
-    print(solver.get_literals_polarities())
     solver.populate_pure_literal()
     
     if solver.dpll():

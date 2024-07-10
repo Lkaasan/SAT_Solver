@@ -76,7 +76,6 @@ class CDCL:
         return True
             
     def change_clause_states(self):
-        unit_change = False
         for clause in self.clauses:
             clause_satisfied = False
             for literal in clause:
@@ -93,7 +92,6 @@ class CDCL:
                         for l in clause:
                             self.literals[abs(l)] += 1
                     self.clauses[clause] = "Unit"
-                    unit_change = True
                 elif self.check_conflict_clause(clause) == True:
                     if self.clauses[clause] == "Resolved":
                         for l in clause:
@@ -104,7 +102,6 @@ class CDCL:
                         for l in clause:
                             self.literals[abs(l)] += 1
                     self.clauses[clause] = "Unresolved"
-        return unit_change
         
     def check_conflict_clause(self, clause):
         assigned_variables = 0
@@ -144,7 +141,6 @@ class CDCL:
     def assign_unit_clause(self, clause):
         implication = []
         l = None  
-
         for literal in clause:
             if abs(literal) not in self.assignment:
                 assignment = literal > 0
