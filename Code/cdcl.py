@@ -48,6 +48,7 @@ class CDCL:
         return [literal for literal in self.literals if literal not in self.assignment]
     
     def dpll(self):
+        self.assign_pure_literals()
         while True:
             self.change_clause_states()
             unit_propagation_result = self.unit_propagation()
@@ -68,7 +69,23 @@ class CDCL:
                     self.decision_level += 1
                 self.make_decision()
                 self.change_clause_states()
-                
+    
+    def assign_pure_literals(self):
+        literals = []
+        for literal in self.literals:
+            positive_literal = self.literals_polarities.get(literal)
+            negative_literal = self.literals_polarities.get(0 - literal)
+            if (positive_literal == 0 and negative_literal != 0):
+                literals.append(0 - literal)
+            elif (positive_literal != 0 and negative_literal == 0):
+                literals.append(literal)
+        for l in literals:
+            if l < 0:
+                self.assignment[abs(l)] = False
+            else:
+                self.assignment[l] = True
+        self.change_clause_states()
+    
     def check_finish(self):
         for x in self.clauses:
             if self.clauses[x] != 'Resolved':
