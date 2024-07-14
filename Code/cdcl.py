@@ -1,3 +1,5 @@
+#CDCL SAT Solver for Imbalanced Instances - Lukas Kaas Andersen
+
 import sys
 import time
 import random

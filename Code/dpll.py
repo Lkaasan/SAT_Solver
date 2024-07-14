@@ -1,4 +1,4 @@
-# SAT Solver for imbalanced instances - Lukas Kaas Andersen
+#DPLL SAT Solver for Imbalanced Instances - Lukas Kaas Andersen
 
 import sys
 import time
