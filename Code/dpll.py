@@ -3,7 +3,6 @@
 import sys
 import time
 import random
-import threading
 
 class DPLL:
     
